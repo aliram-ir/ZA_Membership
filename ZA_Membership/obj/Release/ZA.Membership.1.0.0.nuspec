@@ -10,8 +10,10 @@
     <readme>README.md</readme>
     <projectUrl>https://github.com/aliram-ir/ZA_Membership</projectUrl>
     <description>کتابخانه مدیریت عضویت، احراز هویت و نقش‌ها برای ASP.NET Core</description>
+    <releaseNotes>Initial release with core membership functionality including user management, role-based access control, and clean architecture support.</releaseNotes>
+    <copyright>Copyright (c) 2025 ZA Solutions</copyright>
     <tags>aspnetcore membership authentication authorization jwt roles</tags>
-    <repository type="git" url="https://github.com/aliram-ir/ZA_Membership.git" commit="e7cfe9f64c1ec556ddb4d430ea2264cd4aeeff1f" />
+    <repository type="git" url="https://github.com/aliram-ir/ZA_Membership.git" commit="a730c2d4960371e5b4483aa99bfda3068438605f" />
     <dependencies>
       <group targetFramework="net9.0">
         <dependency id="BCrypt.Net-Next" version="4.0.3" exclude="Build,Analyzers" />
@@ -25,8 +27,10 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="D:\Projects\ASP.NET\ZA_Membership\ZA_Membership\bin\Debug\net9.0\ZA_Membership.dll" target="lib\net9.0\ZA_Membership.dll" />
+    <file src="D:\Projects\ASP.NET\ZA_Membership\ZA_Membership\bin\Release\net9.0\ZA_Membership.dll" target="lib\net9.0\ZA_Membership.dll" />
+    <file src="D:\Projects\ASP.NET\ZA_Membership\ZA_Membership\bin\Release\net9.0\ZA_Membership.xml" target="lib\net9.0\ZA_Membership.xml" />
     <file src="D:\Projects\ASP.NET\ZA_Membership\ZA_Membership\README.md" target="\README.md" />
     <file src="D:\Projects\ASP.NET\ZA_Membership\ZA_Membership\images\icon.png" target="icon.png" />
+    <file src="D:\Projects\ASP.NET\ZA_Membership\ZA_Membership\LICENSE" target="\LICENSE" />
   </files>
 </package>

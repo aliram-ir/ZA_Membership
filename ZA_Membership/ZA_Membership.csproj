@@ -14,9 +14,14 @@
     <PackageProjectUrl>https://github.com/aliram-ir/ZA_Membership</PackageProjectUrl>
     <RepositoryUrl>https://github.com/aliram-ir/ZA_Membership.git</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Copyright>Copyright (c) 2025 ZA Solutions</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageIcon>icon.png</PackageIcon>
+    <PackageReleaseNotes>Initial release with core membership functionality including user management, role-based access control, and clean architecture support.</PackageReleaseNotes>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
 
   </PropertyGroup>
 
@@ -33,6 +38,7 @@
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="\" />
     <None Include="images\icon.png" Pack="true" PackagePath="" />
+    <None Include="LICENSE" Pack="true" PackagePath="\" />
   </ItemGroup>
   
 

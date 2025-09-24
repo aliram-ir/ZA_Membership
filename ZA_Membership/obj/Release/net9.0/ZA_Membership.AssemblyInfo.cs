@@ -11,7 +11,7 @@ using System;
 using System.Reflection;
 
 [assembly: System.Reflection.AssemblyCompanyAttribute("Zarinafzar - ZA")]
-[assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
+[assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyCopyrightAttribute("Copyright (c) 2025 ZA Solutions")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("کتابخانه مدیریت عضویت، احراز هویت و نقش‌ها برای ASP.NET Core")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
