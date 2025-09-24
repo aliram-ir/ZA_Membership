@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>ZA.Membership</id>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <authors>Ali Ramezani</authors>
     <license type="expression">MIT</license>
     <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
@@ -27,8 +27,8 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="D:\Projects\ASP.NET\ZA_Membership\ZA_Membership\bin\Release\net9.0\ZA_Membership.dll" target="lib\net9.0\ZA_Membership.dll" />
-    <file src="D:\Projects\ASP.NET\ZA_Membership\ZA_Membership\bin\Release\net9.0\ZA_Membership.xml" target="lib\net9.0\ZA_Membership.xml" />
+    <file src="D:\Projects\ASP.NET\ZA_Membership\ZA_Membership\bin\Debug\net9.0\ZA_Membership.dll" target="lib\net9.0\ZA_Membership.dll" />
+    <file src="D:\Projects\ASP.NET\ZA_Membership\ZA_Membership\bin\Debug\net9.0\ZA_Membership.xml" target="lib\net9.0\ZA_Membership.xml" />
     <file src="D:\Projects\ASP.NET\ZA_Membership\README.md" target="\README.md" />
     <file src="D:\Projects\ASP.NET\ZA_Membership\ZA_Membership\images\icon.png" target="icon.png" />
     <file src="D:\Projects\ASP.NET\ZA_Membership\ZA_Membership\LICENSE" target="\LICENSE" />

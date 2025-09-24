@@ -10,8 +10,18 @@ using ZA_Membership.Services.Interfaces;
 
 namespace ZA_Membership.Extensions
 {
+    /// <summary>
+    /// Extension methods for IServiceCollection to add ZA_Membership services and configuration.
+    /// </summary>
     public static class ServiceCollectionExtensions
     {
+        /// <summary>
+        /// Adds ZA_Membership services and configures JWT authentication.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="configuration"></param>
+        /// <param name="configSectionName"></param>
+        /// <returns></returns>
         public static IServiceCollection AddZAMembership(
             this IServiceCollection services,
             IConfiguration configuration,
@@ -53,6 +63,12 @@ namespace ZA_Membership.Extensions
             return services;
         }
 
+        /// <summary>
+        /// Adds ZA_Membership services with custom configuration and sets up JWT authentication.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="configureOptions"></param>
+        /// <returns></returns>
         public static IServiceCollection AddZAMembershipWithOptions(
             this IServiceCollection services,
             Action<MembershipOptions> configureOptions)

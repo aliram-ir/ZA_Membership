@@ -1,47 +1,113 @@
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ZA_Membership.Models.Entities
 {
+    /// <summary>
+    /// Represents a user in the system with authentication and profile details.
+    /// </summary>
     public class User
     {
-        [Key]
+        /// <summary>
+        /// The unique identifier for the user.
+        /// </summary>
         public int Id { get; set; }
 
-        [MaxLength(256)]
+        /// <summary>
+        /// The username chosen by the user for login purposes.
+        /// </summary>
         public string Username { get; set; } = string.Empty;
 
-        [EmailAddress]
-        [MaxLength(256)]
+        /// <summary>
+        /// The email address of the user.
+        /// </summary>
         public string Email { get; set; } = string.Empty;
 
-        [MaxLength(10)]
+        /// <summary>
+        /// The national code of the user.
+        /// </summary>
         public string NationalCode { get; set; } = string.Empty;
 
-        [MaxLength(50)]
+        /// <summary>
+        /// The hashed password of the user.
+        /// </summary>
         public string PasswordHash { get; set; } = string.Empty;
 
-        [MaxLength(50)]
+        /// <summary>
+        /// The first name of the user.
+        /// </summary>
         public string? FirstName { get; set; }
 
-        [MaxLength(50)]
+        /// <summary>
+        /// The last name of the user.
+        /// </summary>
         public string? LastName { get; set; }
 
+        /// <summary>
+        /// Gets the full name of the user by combining first and last names.
+        /// </summary>
         [NotMapped]
         public string FullName
         {
             get { return $"{FirstName}  {LastName}"; }
         }
+
+        /// <summary>
+        /// The phone number of the user.
+        /// </summary>
         public string? PhoneNumber { get; set; }
+
+        /// <summary>
+        /// Indicates whether the user account is active.
+        /// </summary>
         public bool IsActive { get; set; } = true;
+
+        //TODO: Add IsLocked Field And Implement Lockout Mechanism
+        //TODO: Add AccessFailedCount Field
+        //TODO: Add LockoutEnd Field
+        //TODO: Add TwoFactorEnabled Field
+        //TODO: Add SecurityStamp Field
+        //TODO: Add ConcurrencyStamp Field
+        //TODO: Add ProfilePictureUrl Field
+        //TODO: Add DateOfBirth Field
+        //TODO: Add Address Field
+        //TODO: Add IsDelete Field For Soft Delete
+
+        /// <summary>
+        /// Indicates whether the user's email has been confirmed.
+        /// </summary>
         public bool EmailConfirmed { get; set; } = false;
+
+        /// <summary>
+        /// Indicates whether the user's phone number has been confirmed.
+        /// </summary>
         public bool PhoneNumberConfirmed { get; set; } = false;
-        public DateTime CreatedAt { get; set; }
+
+        /// <summary>
+        /// The date and time when the user account was created.
+        /// </summary>
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        /// <summary>
+        /// The date and time when the user account was last updated.
+        /// </summary>
         public DateTime? UpdatedAt { get; set; }
+
+        /// <summary>
+        /// The date and time when the user last logged in.
+        /// </summary>
+        
+        //TODO: Delete This Field And Create UserActivity Table
         public DateTime? LastLoginAt { get; set; }
 
         // Navigation Properties
-        public virtual ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
-        public virtual ICollection<UserToken> UserTokens { get; set; } = new List<UserToken>();
+        /// <summary>
+        /// The roles associated with the user.
+        /// </summary>
+        public virtual ICollection<UserRole> UserRoles { get; set; } = [];
+
+        /// <summary>
+        /// The refresh tokens associated with the user.
+        /// </summary>
+        public virtual ICollection<UserToken> UserTokens { get; set; } = [];
     }
 }

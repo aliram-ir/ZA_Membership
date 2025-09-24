@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Http;
 using ZA_Membership.Configuration;
 using ZA_Membership.Models.DTOs;
 using ZA_Membership.Models.Entities;
@@ -8,6 +7,9 @@ using ZA_Membership.Services.Interfaces;
 
 namespace ZA_Membership.Services.Implementations
 {
+    /// <summary>
+    /// Implementation of membership services including user registration, login, token management, and user profile management.
+    /// </summary>
     public class MembershipService : IMembershipService
     {
         private readonly IUserRepository _userRepository;
@@ -17,6 +19,15 @@ namespace ZA_Membership.Services.Implementations
         private readonly IPasswordService _passwordService;
         private readonly MembershipOptions _options;
 
+        /// <summary>
+        /// Constructor for MembershipService.
+        /// </summary>
+        /// <param name="userRepository"></param>
+        /// <param name="tokenRepository"></param>
+        /// <param name="roleRepository"></param>
+        /// <param name="jwtTokenService"></param>
+        /// <param name="passwordService"></param>
+        /// <param name="options"></param>
         public MembershipService(
             IUserRepository userRepository,
             IUserTokenRepository tokenRepository,
@@ -33,6 +44,7 @@ namespace ZA_Membership.Services.Implementations
             _options = options;
         }
 
+        /// <inheritdoc/>
         public async Task<AuthResult> RegisterAsync(RegisterDto registerDto)
         {
             try

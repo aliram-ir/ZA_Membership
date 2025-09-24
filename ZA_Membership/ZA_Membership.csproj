@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
 
     <PackageId>ZA.Membership</PackageId>
-    <PackageVersion>1.0.0</PackageVersion>
+    <PackageVersion>1.0.1</PackageVersion>
     <Authors>Ali Ramezani</Authors>
     <Company>Zarinafzar - ZA</Company>
     <Description>کتابخانه مدیریت عضویت، احراز هویت و نقش‌ها برای ASP.NET Core</Description>
