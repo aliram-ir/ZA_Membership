@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>ZA.Membership</id>
+    <version>1.0.0</version>
+    <authors>Ali Ramezani</authors>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <icon>icon.png</icon>
+    <readme>README.md</readme>
+    <projectUrl>https://github.com/aliram-ir/ZA_Membership</projectUrl>
+    <description>کتابخانه مدیریت عضویت، احراز هویت و نقش‌ها برای ASP.NET Core</description>
+    <tags>aspnetcore membership authentication authorization jwt roles</tags>
+    <repository type="git" url="https://github.com/aliram-ir/ZA_Membership.git" commit="e7cfe9f64c1ec556ddb4d430ea2264cd4aeeff1f" />
+    <dependencies>
+      <group targetFramework="net9.0">
+        <dependency id="BCrypt.Net-Next" version="4.0.3" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.AspNetCore.Authentication.JwtBearer" version="8.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.AspNetCore.Http.Abstractions" version="2.2.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.AspNetCore.Identity" version="2.2.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="8.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.DependencyInjection.Abstractions" version="8.0.0" exclude="Build,Analyzers" />
+        <dependency id="System.IdentityModel.Tokens.Jwt" version="7.0.3" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="D:\Projects\ASP.NET\ZA_Membership\ZA_Membership\bin\Debug\net9.0\ZA_Membership.dll" target="lib\net9.0\ZA_Membership.dll" />
+    <file src="D:\Projects\ASP.NET\ZA_Membership\ZA_Membership\README.md" target="\README.md" />
+    <file src="D:\Projects\ASP.NET\ZA_Membership\ZA_Membership\images\icon.png" target="icon.png" />
+  </files>
+</package>

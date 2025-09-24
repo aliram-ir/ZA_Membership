@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("کتابخانه مدیریت عضویت، احراز هویت و نقش‌ها برای ASP.NET Core")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+84b5ed49156f6874d796158049b465b397aea327")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e7cfe9f64c1ec556ddb4d430ea2264cd4aeeff1f")]
 [assembly: System.Reflection.AssemblyProductAttribute("ZA_Membership")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ZA_Membership")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
