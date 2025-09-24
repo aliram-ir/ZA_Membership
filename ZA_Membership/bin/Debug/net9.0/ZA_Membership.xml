@@ -4,5 +4,1463 @@
         <name>ZA_Membership</name>
     </assembly>
     <members>
+        <member name="T:ZA_Membership.Configuration.JwtOptions">
+            <summary>
+            Configuration options for JWT (JSON Web Token) authentication.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Configuration.JwtOptions.SecretKey">
+            <summary>
+            The secret key used for signing JWTs. Must be kept secure and not hard-coded in production.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Configuration.JwtOptions.Issuer">
+            <summary>
+            The issuer of the JWT, typically the application or service generating the token.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Configuration.JwtOptions.Audience">
+            <summary>
+            The intended audience of the JWT, typically the application or service that will consume the token.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Configuration.JwtOptions.AccessTokenExpiryMinutes">
+            <summary>
+            The expiration time for access tokens in minutes.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Configuration.JwtOptions.RefreshTokenExpiryDays">
+            <summary>
+            The expiration time for refresh tokens in days.
+            </summary>
+        </member>
+        <member name="T:ZA_Membership.Configuration.MembershipOptions">
+            <summary>
+            Configuration options for the ZA_Membership system, including JWT, password, user, and security settings.
+            تنظیمات مربوط به سیستم ZA_Membership، شامل JWT، رمز عبور، کاربر و تنظیمات امنیتی.
+            این کلاس به عنوان یک نقطه مرکزی برای مدیریت تنظیمات مختلف مربوط به عضویت کاربران عمل می‌کند.
+            اگر این تنظیمات به درستی پیکربندی شوند، می‌توانند به بهبود امنیت، تجربه کاربری و مدیریت کاربران کمک کنند.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Configuration.MembershipOptions.Jwt">
+            <summary>
+            Configuration options for JWT (JSON Web Token) authentication.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Configuration.MembershipOptions.Password">
+            <summary>
+            Configuration options for password policies and settings.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Configuration.MembershipOptions.User">
+            <summary>
+            Configuration options for user-related settings.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Configuration.MembershipOptions.Security">
+            <summary>
+            Configuration options for security-related settings.
+            </summary>
+        </member>
+        <member name="T:ZA_Membership.Configuration.PasswordOptions">
+            <summary>
+            Configuration options for password policies and settings.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Configuration.PasswordOptions.MinimumLength">
+            <summary>
+            The minimum length required for passwords.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Configuration.PasswordOptions.RequireUppercase">
+            <summary>
+            Indicates whether passwords must contain at least one uppercase letter.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Configuration.PasswordOptions.RequireLowercase">
+            <summary>
+            Indicates whether passwords must contain at least one lowercase letter.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Configuration.PasswordOptions.RequireDigit">
+            <summary>
+            Indicates whether passwords must contain at least one digit.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Configuration.PasswordOptions.RequireSpecialCharacter">
+            <summary>
+            Indicates whether passwords must contain at least one special character (e.g., !, @, #, $, etc.).
+            </summary>
+        </member>
+        <member name="T:ZA_Membership.Configuration.SecurityOptions">
+            <summary>
+            Configuration options for security-related settings.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Configuration.SecurityOptions.MaxFailedAccessAttempts">
+            <summary>
+            The maximum number of failed access attempts before a user account is locked out.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Configuration.SecurityOptions.LockoutTimeSpanMinutes">
+            <summary>
+            The time span (in minutes) for which a user account remains locked out after reaching the maximum failed access attempts.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Configuration.SecurityOptions.RequireTwoFactor">
+            <summary>
+            Indicates whether two-factor authentication is required for user accounts.
+            </summary>
+        </member>
+        <member name="T:ZA_Membership.Configuration.UserOptions">
+            <summary>
+            Configuration options for user-related settings.
+            تنظیمات مربوط به کاربران مانند الزامات ایمیل و نام کاربری.
+            اگر این گزینه‌ها به درستی تنظیم شوند، می‌توانند به بهبود امنیت و مدیریت کاربران کمک کنند.
+            برای مثال، الزام به یکتایی ایمیل می‌تواند از ایجاد چندین حساب با یک ایمیل جلوگیری کند.
+            همچنین، اگر تأیید ایمیل یا شماره تلفن فعال باشد، کاربران باید قبل از ورود به سیستم، ایمیل یا شماره تلفن خود را تأیید کنند که این امر می‌تواند امنیت حساب را افزایش دهد.
+            اگر محدودیت‌های کاراکترهای نام کاربری فعال باشد، می‌توان از استفاده از کاراکترهای غیرمجاز جلوگیری کرد که این نیز می‌تواند به امنیت و یکپارچگی سیستم کمک کند.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Configuration.UserOptions.UserNameStrategy">
+            <summary>
+            Specifies the strategy for generating or validating user names.
+            استراتژی تولید یا اعتبارسنجی نام‌های کاربری را مشخص می‌کند
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Configuration.UserOptions.RequireUniqueEmail">
+            <summary>
+            Indicates whether each user must have a unique email address.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Configuration.UserOptions.RequireEmailConfirmation">
+            <summary>
+            Indicates whether email confirmation is required before a user can sign in.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Configuration.UserOptions.RequirePhoneNumberConfirmation">
+            <summary>
+            Indicates whether phone number confirmation is required before a user can sign in.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Configuration.UserOptions.AllowedUserNameCharacters">
+            <summary>
+            Indicates whether to enforce restrictions on allowed characters in usernames.
+            اگر این گزینه فعال باشد، نام‌های کاربری باید فقط شامل حروف الفبا، اعداد و برخی کاراکترهای خاص باشند.
+            </summary>
+        </member>
+        <member name="T:ZA_Membership.Extensions.ServiceCollectionExtensions">
+            <summary>
+            Extension methods for IServiceCollection to add ZA_Membership services and configuration.
+            </summary>
+        </member>
+        <member name="M:ZA_Membership.Extensions.ServiceCollectionExtensions.AddZAMembership(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration,System.String)">
+            <summary>
+            Adds ZA_Membership services and configures JWT authentication.
+            </summary>
+            <param name="services"></param>
+            <param name="configuration"></param>
+            <param name="configSectionName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Extensions.ServiceCollectionExtensions.AddZAMembershipWithOptions(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{ZA_Membership.Configuration.MembershipOptions})">
+            <summary>
+            Adds ZA_Membership services with custom configuration and sets up JWT authentication.
+            </summary>
+            <param name="services"></param>
+            <param name="configureOptions"></param>
+            <returns></returns>
+        </member>
+        <member name="T:ZA_Membership.Models.DTOs.ChangePasswordDto">
+            <summary>
+            Data Transfer Object for changing a user's password.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.ChangePasswordDto.CurrentPassword">
+            <summary>
+            The user's current password.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.ChangePasswordDto.NewPassword">
+            <summary>
+            The new password to set for the user.
+            </summary>
+        </member>
+        <member name="T:ZA_Membership.Models.DTOs.LoginDto">
+            <summary>
+            Data Transfer Object for user login.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.LoginDto.Username">
+            <summary>
+            The username of the user attempting to log in.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.LoginDto.Password">
+            <summary>
+            The password of the user attempting to log in.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.LoginDto.RememberMe">
+            <summary>
+            Indicates whether the user wants to be remembered on the device.
+            </summary>
+        </member>
+        <member name="T:ZA_Membership.Models.DTOs.LogoutDto">
+            <summary>
+            Data Transfer Object for user logout.
+            </summary>
+        </member>
+        <member name="M:ZA_Membership.Models.DTOs.LogoutDto.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ZA_Membership.Models.DTOs.LogoutDto"/> class.
+            </summary>
+            <param name="refreshToken"></param>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.LogoutDto.RefreshToken">
+            <summary>
+            The refresh token used to invalidate the user's session.
+            </summary>
+        </member>
+        <member name="T:ZA_Membership.Models.DTOs.RefreshTokenDto">
+            <summary>
+            Data Transfer Object for refreshing JWT tokens.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.RefreshTokenDto.RefreshToken">
+            <summary>
+            The refresh token used to obtain a new JWT.
+            </summary>
+        </member>
+        <member name="T:ZA_Membership.Models.DTOs.RegisterDto">
+            <summary>
+            شی انتقال داده برای ثبت نام کاربر جدید.
+            Data Transfer Object for registering a new user.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.RegisterDto.Username">
+            <summary>
+            نام کاربری منحصر به فرد برای کاربر.
+            A unique username for the user.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.RegisterDto.Email">
+            <summary>
+            آدرس ایمیل کاربر.
+            The user's email address.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.RegisterDto.NationalCode">
+            <summary>
+            کد ملی کاربر (اختیاری).
+            The user's national code (optional).
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.RegisterDto.Password">
+            <summary>
+            رمز عبور کاربر.
+            The user's password.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.RegisterDto.FirstName">
+            <summary>
+            نام کوچک کاربر (اختیاری).
+            The user's first name (optional).
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.RegisterDto.LastName">
+            <summary>
+            نام خانوادگی کاربر (اختیاری).
+            The user's last name (optional).
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.RegisterDto.PhoneNumber">
+            <summary>
+            شماره تلفن کاربر (اختیاری).
+            The user's phone number (optional).
+            </summary>
+        </member>
+        <member name="T:ZA_Membership.Models.DTOs.UpdateUserDto">
+            <summary>
+            Data Transfer Object for updating user information.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.UpdateUserDto.FirstName">
+            <summary>
+            The first name of the user.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.UpdateUserDto.LastName">
+            <summary>
+            The last name of the user.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.UpdateUserDto.PhoneNumber">
+            <summary>
+            The phone number of the user.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.UpdateUserDto.Email">
+            <summary>
+            The email address of the user.
+            </summary>
+        </member>
+        <member name="T:ZA_Membership.Models.DTOs.UserDto">
+            <summary>
+            Data Transfer Object for user information.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.UserDto.Id">
+            <summary>
+            The unique identifier of the user.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.UserDto.Username">
+            <summary>
+            The username of the user.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.UserDto.Email">
+            <summary>
+            The email address of the user.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.UserDto.NationalCode">
+            <summary>
+            The national code of the user.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.UserDto.FirstName">
+            <summary>
+            The first name of the user.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.UserDto.LastName">
+            <summary>
+            The last name of the user.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.UserDto.PhoneNumber">
+            <summary>
+            The phone number of the user.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.UserDto.IsActive">
+            <summary>
+            Indicates whether the user account is active.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.UserDto.EmailConfirmed">
+            <summary>
+            Indicates whether the user's email has been confirmed.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.UserDto.PhoneNumberConfirmed">
+            <summary>
+            Indicates whether the user's phone number has been confirmed.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.UserDto.CreatedAt">
+            <summary>
+            The date and time when the user account was created.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.UserDto.LastLoginAt">
+            <summary>
+            The date and time when the user last logged in.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.UserDto.Roles">
+            <summary>
+            The roles assigned to the user.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.DTOs.UserDto.Permissions">
+            <summary>
+            The permissions granted to the user.
+            </summary>
+        </member>
+        <member name="T:ZA_Membership.Models.Entities.Permission">
+            <summary>
+            Represents a permission that can be assigned to roles for access control.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.Permission.Id">
+            <summary>
+            The unique identifier for the permission.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.Permission.Name">
+            <summary>
+            The name of the permission.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.Permission.Description">
+            <summary>
+            A brief description of what the permission allows.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.Permission.Category">
+            <summary>
+            The category of the permission for organizational purposes.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.Permission.IsActive">
+            <summary>
+            Indicates whether the permission is currently active and can be assigned.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.Permission.RolePermissions">
+            <summary>
+            The roles that have this permission assigned.
+            </summary>
+        </member>
+        <member name="T:ZA_Membership.Models.Entities.Role">
+            <summary>
+            Represents a role that can be assigned to users for access control.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.Role.Id">
+            <summary>
+            The unique identifier for the role.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.Role.Name">
+            <summary>
+            The name of the role.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.Role.Description">
+            <summary>
+            A brief description of the role and its purpose.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.Role.IsActive">
+            <summary>
+            Indicates whether the role is currently active and can be assigned to users.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.Role.CreatedAt">
+            <summary>
+            The date and time when the role was created.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.Role.UserRoles">
+            <summary>
+            The users that are assigned to this role.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.Role.RolePermissions">
+            <summary>
+            The permissions that are assigned to this role.
+            </summary>
+        </member>
+        <member name="T:ZA_Membership.Models.Entities.RolePermission">
+            <summary>
+            Represents the association between a Role and a Permission.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.RolePermission.Id">
+            <summary>
+            The unique identifier for the RolePermission entry.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.RolePermission.RoleId">
+            <summary>
+            The ID of the associated Role.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.RolePermission.PermissionId">
+            <summary>
+            The ID of the associated Permission.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.RolePermission.Role">
+            <summary>
+            Indicates whether the RolePermission entry is currently active.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.RolePermission.Permission">
+            <summary>
+            The associated Permission entity.
+            </summary>
+        </member>
+        <member name="T:ZA_Membership.Models.Entities.User">
+            <summary>
+            Represents a user in the system with authentication and profile details.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.User.Id">
+            <summary>
+            The unique identifier for the user.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.User.Username">
+            <summary>
+            The username chosen by the user for login purposes.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.User.Email">
+            <summary>
+            The email address of the user.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.User.NationalCode">
+            <summary>
+            The national code of the user.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.User.PasswordHash">
+            <summary>
+            The hashed password of the user.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.User.FirstName">
+            <summary>
+            The first name of the user.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.User.LastName">
+            <summary>
+            The last name of the user.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.User.FullName">
+            <summary>
+            Gets the full name of the user by combining first and last names.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.User.PhoneNumber">
+            <summary>
+            The phone number of the user.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.User.IsActive">
+            <summary>
+            Indicates whether the user account is active.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.User.EmailConfirmed">
+            <summary>
+            Indicates whether the user's email has been confirmed.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.User.PhoneNumberConfirmed">
+            <summary>
+            Indicates whether the user's phone number has been confirmed.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.User.CreatedAt">
+            <summary>
+            The date and time when the user account was created.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.User.UpdatedAt">
+            <summary>
+            The date and time when the user account was last updated.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.User.LastLoginAt">
+            <summary>
+            The date and time when the user last logged in.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.User.UserRoles">
+            <summary>
+            The roles associated with the user.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.User.UserTokens">
+            <summary>
+            The refresh tokens associated with the user.
+            </summary>
+        </member>
+        <member name="T:ZA_Membership.Models.Entities.UserRole">
+            <summary>
+            Entity representing the association between users and roles.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.UserRole.Id">
+            <summary>
+            The unique identifier for the UserRole entry.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.UserRole.UserId">
+            <summary>
+            The ID of the user associated with the role.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.UserRole.RoleId">
+            <summary>
+            The ID of the role assigned to the user.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.UserRole.AssignedAt">
+            <summary>
+            The date and time when the role was assigned to the user.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.UserRole.User">
+            <summary>
+            The user associated with this UserRole entry.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.UserRole.Role">
+            <summary>
+            The role associated with this UserRole entry.
+            </summary>
+        </member>
+        <member name="T:ZA_Membership.Models.Entities.UserToken">
+            <summary>
+            Entity representing tokens associated with users for various purposes (e.g., authentication, email confirmation).
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.UserToken.Id">
+            <summary>
+            The unique identifier for the UserToken entry.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.UserToken.UserId">
+            <summary>
+            The ID of the user associated with the token.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.UserToken.Token">
+            <summary>
+            The token string used for authentication or other purposes.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.UserToken.TokenType">
+            <summary>
+            The type of the token (e.g., "AccessToken", "RefreshToken", "EmailConfirmation").
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.UserToken.CreatedAt">
+            <summary>
+            The date and time when the token was created.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.UserToken.ExpiresAt">
+            <summary>
+            The date and time when the token expires.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.UserToken.IsRevoked">
+            <summary>
+            Indicates whether the token has been revoked.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.UserToken.DeviceInfo">
+            <summary>
+            Optional information about the device from which the token was issued.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.UserToken.IpAddress">
+            <summary>
+            Optional IP address from which the token was issued.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Entities.UserToken.User">
+            <summary>
+            The user associated with this token.
+            </summary>
+        </member>
+        <member name="T:ZA_Membership.Models.Enums.UserNameEnum">
+            <summary>
+            Enumeration for different types of user name generation strategies.
+            </summary>
+        </member>
+        <member name="F:ZA_Membership.Models.Enums.UserNameEnum.Custom">
+            <summary>
+            Indicates a custom user name provided by the user.
+            </summary>
+        </member>
+        <member name="F:ZA_Membership.Models.Enums.UserNameEnum.Email">
+            <summary>
+            Indicates that the user name will be generated based on the user's email address.
+            </summary>
+        </member>
+        <member name="F:ZA_Membership.Models.Enums.UserNameEnum.PhoneNumber">
+            <summary>
+            Indicates that the user name will be generated based on the user's phone number.
+            </summary>
+        </member>
+        <member name="F:ZA_Membership.Models.Enums.UserNameEnum.NationalCode">
+            <summary>
+            Indicates that the user name will be generated based on the user's national code.
+            </summary>
+        </member>
+        <member name="F:ZA_Membership.Models.Enums.UserNameEnum.All">
+            <summary>
+            Indicates that all user name generation strategies are allowed.
+            </summary>
+        </member>
+        <member name="F:ZA_Membership.Models.Enums.UserNameEnum.Random">
+            <summary>
+            Indicates that the user name will be generated randomly.
+            </summary>
+        </member>
+        <member name="T:ZA_Membership.Models.Results.AuthResult">
+            <summary>
+            Result of an authentication operation, including tokens and user info.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Results.AuthResult.IsSuccess">
+            <summary>
+            Indicates whether the authentication was successful.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Results.AuthResult.AccessToken">
+            <summary>
+            The access token issued upon successful authentication.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Results.AuthResult.RefreshToken">
+            <summary>
+            The refresh token issued upon successful authentication.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Results.AuthResult.ExpiresAt">
+            <summary>
+            The expiration time of the access token.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Results.AuthResult.User">
+            <summary>
+            The authenticated user's information.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Results.AuthResult.Errors">
+            <summary>
+            A list of error messages if the authentication failed.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Results.AuthResult.Message">
+            <summary>
+            An optional message providing additional context about the authentication result.
+            </summary>
+        </member>
+        <member name="T:ZA_Membership.Models.Results.ServiceResult`1">
+            <summary>
+            Generic service result class to encapsulate operation outcomes.
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="P:ZA_Membership.Models.Results.ServiceResult`1.IsSuccess">
+            <summary>
+            Indicates whether the operation was successful.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Results.ServiceResult`1.Data">
+            <summary>
+            The data returned from the operation, if any.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Results.ServiceResult`1.Message">
+            <summary>
+            An optional message providing additional context about the operation result.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Models.Results.ServiceResult`1.Errors">
+            <summary>
+            A list of error messages if the operation failed.
+            </summary>
+        </member>
+        <member name="M:ZA_Membership.Models.Results.ServiceResult`1.Success(`0,System.String)">
+            <summary>
+            Creates a successful service result.
+            </summary>
+            <param name="data"></param>
+            <param name="message"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Models.Results.ServiceResult`1.Failure(System.String,System.String)">
+            <summary>
+            Creates a failed service result.
+            </summary>
+            <param name="error"></param>
+            <param name="message"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Models.Results.ServiceResult`1.Failure(System.Collections.Generic.List{System.String},System.String)">
+            <summary>
+            Creates a failed service result with multiple errors.
+            </summary>
+            <param name="errors"></param>
+            <param name="message"></param>
+            <returns></returns>
+        </member>
+        <member name="T:ZA_Membership.Models.Results.ServiceResult">
+            <summary>
+            Non-generic service result class for operations that do not return data.
+            </summary>
+        </member>
+        <member name="M:ZA_Membership.Models.Results.ServiceResult.Success(System.String)">
+            <summary>
+            Creates a successful service result.
+            </summary>
+            <param name="message"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Models.Results.ServiceResult.Failure(System.String,System.String)">
+            <summary>
+            Creates a failed service result.
+            </summary>
+            <param name="error"></param>
+            <param name="message"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Models.Results.ServiceResult.Failure(System.Collections.Generic.List{System.String},System.String)">
+            <summary>
+            Creates a failed service result with multiple errors.
+            </summary>
+            <param name="errors"></param>
+            <param name="message"></param>
+            <returns></returns>
+        </member>
+        <member name="T:ZA_Membership.Resources.Messages">
+            <summary>
+            A placeholder class for resource messages.
+            </summary>
+        </member>
+        <member name="T:ZA_Membership.Security.ICurrentUserService">
+            <summary>
+            اینترفیس سرویس کاربر جاری که اطلاعات کاربر احراز هویت شده را فراهم می‌کند.
+            Interface for the current user service that provides information about the authenticated user.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Security.ICurrentUserService.UserId">
+            <summary>
+            شناسه کاربر جاری یا null اگر کاربر احراز هویت نشده باشد.
+            The current user's ID or null if the user is not authenticated.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Security.ICurrentUserService.Username">
+            <summary>
+            نام کاربری کاربر جاری یا null اگر کاربر احراز هویت نشده باشد.
+            The current user's username or null if the user is not authenticated.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Security.ICurrentUserService.Email">
+            <summary>
+            ایمیل کاربر جاری یا null اگر کاربر احراز هویت نشده باشد.
+            The current user's email or null if the user is not authenticated.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Security.ICurrentUserService.IsAuthenticated">
+            <summary>
+            مشخص می‌کند که آیا کاربر احراز هویت شده است یا خیر.
+            Indicates whether the user is authenticated.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Security.ICurrentUserService.Roles">
+            <summary>
+            لیست نقش‌های کاربر جاری.
+            List of roles for the current user.
+            </summary>
+        </member>
+        <member name="P:ZA_Membership.Security.ICurrentUserService.Permissions">
+            <summary>
+            لیست مجوزهای کاربر جاری.
+            List of permissions for the current user.
+            </summary>
+        </member>
+        <member name="M:ZA_Membership.Security.ICurrentUserService.HasPermission(System.String)">
+            <summary>
+            بررسی می‌کند که آیا کاربر جاری دارای مجوز مشخص شده است یا خیر.
+            Checks if the current user has the specified permission.
+            </summary>
+            <param name="permission"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Security.ICurrentUserService.IsInRole(System.String)">
+            <summary>
+            بررسی می‌کند که آیا کاربر جاری دارای نقش مشخص شده است یا خیر.
+            Checks if the current user has the specified role.
+            </summary>
+            <param name="role"></param>
+            <returns></returns>
+        </member>
+        <member name="T:ZA_Membership.Security.CurrentUserService">
+            <summary>
+            پیاده‌سازی سرویس کاربر جاری که اطلاعات کاربر احراز هویت شده را از HttpContext استخراج می‌کند.
+            Implementation of the current user service that extracts authenticated user information from HttpContext.
+            </summary>
+        </member>
+        <member name="M:ZA_Membership.Security.CurrentUserService.#ctor(Microsoft.AspNetCore.Http.IHttpContextAccessor)">
+            <summary>
+            ایجاد یک نمونه جدید از سرویس کاربر جاری با استفاده از IHttpContextAccessor برای دسترسی به HttpContext.
+            Creates a new instance of the current user service using IHttpContextAccessor to access HttpContext.
+            </summary>
+            <param name="httpContextAccessor"></param>
+        </member>
+        <member name="P:ZA_Membership.Security.CurrentUserService.UserId">
+            <inheritdoc/>
+        </member>
+        <member name="P:ZA_Membership.Security.CurrentUserService.Username">
+            <inheritdoc/>
+        </member>
+        <member name="P:ZA_Membership.Security.CurrentUserService.Email">
+            <inheritdoc/>
+        </member>
+        <member name="P:ZA_Membership.Security.CurrentUserService.IsAuthenticated">
+            <inheritdoc/>
+        </member>
+        <member name="P:ZA_Membership.Security.CurrentUserService.Roles">
+            <inheritdoc/>
+        </member>
+        <member name="P:ZA_Membership.Security.CurrentUserService.Permissions">
+            <inheritdoc/>
+        </member>
+        <member name="M:ZA_Membership.Security.CurrentUserService.HasPermission(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ZA_Membership.Security.CurrentUserService.IsInRole(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ZA_Membership.Security.CurrentUserService.GetClaimValue``1(System.String,System.Func{System.String,``0})">
+            <inheritdoc/>
+        </member>
+        <member name="T:ZA_Membership.Security.IJwtTokenService">
+            <summary>
+            Service for generating and validating JWT tokens.
+            </summary>
+        </member>
+        <member name="M:ZA_Membership.Security.IJwtTokenService.GenerateAccessToken(ZA_Membership.Models.Entities.User,System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String})">
+            <summary>
+            Generates a JWT access token for the specified user, roles, and permissions.
+            </summary>
+            <param name="user"></param>
+            <param name="roles"></param>
+            <param name="permissions"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Security.IJwtTokenService.GenerateRefreshToken">
+            <summary>
+            Generates a secure refresh token.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Security.IJwtTokenService.ValidateToken(System.String)">
+            <summary>
+            Validates the specified JWT token and returns the associated claims principal if valid.
+            </summary>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Security.IJwtTokenService.GetTokenExpiration(System.String)">
+            <summary>
+            Gets the expiration date and time of the specified JWT token.
+            </summary>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="T:ZA_Membership.Security.JwtTokenService">
+            <summary>
+            Implementation of the IJwtTokenService interface for handling JWT tokens.
+            </summary>
+        </member>
+        <member name="F:ZA_Membership.Security.JwtTokenService._options">
+            <inheritdoc/>
+        </member>
+        <member name="M:ZA_Membership.Security.JwtTokenService.#ctor(ZA_Membership.Configuration.MembershipOptions)">
+            <summary>
+            Initializes a new instance of the JwtTokenService class with the specified membership options.
+            </summary>
+            <param name="options"></param>
+        </member>
+        <member name="M:ZA_Membership.Security.JwtTokenService.GenerateAccessToken(ZA_Membership.Models.Entities.User,System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String})">
+            <inheritdoc/>
+        </member>
+        <member name="M:ZA_Membership.Security.JwtTokenService.GenerateRefreshToken">
+            <inheritdoc/>
+        </member>
+        <member name="M:ZA_Membership.Security.JwtTokenService.ValidateToken(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ZA_Membership.Security.JwtTokenService.GetTokenExpiration(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="T:ZA_Membership.Security.IPasswordService">
+            <summary>
+            Service for handling password hashing, verification, and validation.
+            </summary>
+        </member>
+        <member name="M:ZA_Membership.Security.IPasswordService.HashPassword(System.String)">
+            <summary>
+            Hashes the specified password using a secure hashing algorithm.
+            </summary>
+            <param name="password"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Security.IPasswordService.VerifyPassword(System.String,System.String)">
+            <summary>
+            Verifies the specified password against the given hashed password.
+            </summary>
+            <param name="password"></param>
+            <param name="hashedPassword"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Security.IPasswordService.ValidatePassword(System.String,System.Collections.Generic.List{System.String}@)">
+            <summary>
+            Validates the specified password against the configured password policies.
+            </summary>
+            <param name="password"></param>
+            <param name="errors"></param>
+            <returns></returns>
+        </member>
+        <member name="T:ZA_Membership.Security.PasswordService">
+            <summary>
+            Implementation of the IPasswordService interface for handling password operations.
+            </summary>
+        </member>
+        <member name="M:ZA_Membership.Security.PasswordService.#ctor(ZA_Membership.Configuration.MembershipOptions)">
+            <summary>
+            Initializes a new instance of the PasswordService class with the specified membership options.
+            </summary>
+            <param name="options"></param>
+        </member>
+        <member name="M:ZA_Membership.Security.PasswordService.HashPassword(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ZA_Membership.Security.PasswordService.VerifyPassword(System.String,System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ZA_Membership.Security.PasswordService.ValidatePassword(System.String,System.Collections.Generic.List{System.String}@)">
+            <inheritdoc/>
+        </member>
+        <member name="T:ZA_Membership.Security.RequirePermissionAttribute">
+            <summary>
+            Attribute to enforce permission-based authorization on controller actions.
+            </summary>
+        </member>
+        <member name="M:ZA_Membership.Security.RequirePermissionAttribute.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the RequirePermissionAttribute class with the specified permission.
+            </summary>
+            <param name="permission"></param>
+        </member>
+        <member name="M:ZA_Membership.Security.RequirePermissionAttribute.OnAuthorization(Microsoft.AspNetCore.Mvc.Filters.AuthorizationFilterContext)">
+            <summary>
+            Called to perform authorization check.
+            </summary>
+            <param name="context"></param>
+        </member>
+        <member name="T:ZA_Membership.Services.Implementations.MembershipService">
+            <summary>
+            Implementation of membership services including user registration, login, token management, and user profile management.
+            </summary>
+        </member>
+        <member name="M:ZA_Membership.Services.Implementations.MembershipService.#ctor(ZA_Membership.Services.Interfaces.IUserRepository,ZA_Membership.Services.Interfaces.IUserTokenRepository,ZA_Membership.Services.Interfaces.IRoleRepository,ZA_Membership.Security.IJwtTokenService,ZA_Membership.Security.IPasswordService,ZA_Membership.Configuration.MembershipOptions)">
+            <summary>
+            Constructor for MembershipService.
+            </summary>
+            <param name="userRepository"></param>
+            <param name="tokenRepository"></param>
+            <param name="roleRepository"></param>
+            <param name="jwtTokenService"></param>
+            <param name="passwordService"></param>
+            <param name="options"></param>
+        </member>
+        <member name="M:ZA_Membership.Services.Implementations.MembershipService.RegisterAsync(ZA_Membership.Models.DTOs.RegisterDto)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ZA_Membership.Services.Implementations.MembershipService.LoginAsync(ZA_Membership.Models.DTOs.LoginDto,System.String,System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ZA_Membership.Services.Implementations.MembershipService.LogoutAsync(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ZA_Membership.Services.Implementations.MembershipService.LogoutAllDevicesAsync(System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ZA_Membership.Services.Implementations.MembershipService.RefreshTokenAsync(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ZA_Membership.Services.Implementations.MembershipService.GetUserAsync(System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ZA_Membership.Services.Implementations.MembershipService.UpdateUserAsync(System.Int32,ZA_Membership.Models.DTOs.UpdateUserDto)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ZA_Membership.Services.Implementations.MembershipService.ChangePasswordAsync(System.Int32,ZA_Membership.Models.DTOs.ChangePasswordDto)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ZA_Membership.Services.Implementations.MembershipService.DeactivateUserAsync(System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ZA_Membership.Services.Implementations.MembershipService.ActivateUserAsync(System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ZA_Membership.Services.Implementations.MembershipService.AssignRoleAsync(System.Int32,System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ZA_Membership.Services.Implementations.MembershipService.RemoveRoleAsync(System.Int32,System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ZA_Membership.Services.Implementations.MembershipService.GetUserRolesAsync(System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ZA_Membership.Services.Implementations.MembershipService.GetUserPermissionsAsync(System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ZA_Membership.Services.Implementations.MembershipService.HasPermissionAsync(System.Int32,System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:ZA_Membership.Services.Implementations.MembershipService.IsInRoleAsync(System.Int32,System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="T:ZA_Membership.Services.Interfaces.IMembershipService">
+            <summary>
+            فارسی: اینترفیس سرویس عضویت و احراز هویت
+            English: Membership and Authentication Service Interface
+            </summary>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IMembershipService.RegisterAsync(ZA_Membership.Models.DTOs.RegisterDto)">
+            <summary>
+            ثبت نام کاربر جدید با اطلاعات داده شده.
+            Registers a new user with the given information.
+            </summary>
+            <param name="registerDto">The user data transfer object containing registration info.</param>
+            <returns>Returns true if registration was successful, false otherwise.</returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IMembershipService.LoginAsync(ZA_Membership.Models.DTOs.LoginDto,System.String,System.String)">
+            <summary>
+            فارسی: احراز هویت کاربر و بازگشت نتیجه احراز هویت شامل توکن‌ها و اطلاعات کاربر.
+            Authenticates a user and returns an authentication result containing tokens and user info.
+            </summary>
+            <param name="loginDto"></param>
+            <param name="ipAddress"></param>
+            <param name="deviceInfo"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IMembershipService.LogoutAsync(System.String)">
+            <summary>
+            فارسی: خروج کاربر با نامعتبر کردن توکن ارائه شده.
+            Logs out a user by invalidating the provided token.
+            </summary>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IMembershipService.LogoutAllDevicesAsync(System.Int32)">
+            <summary>
+            خروج کاربر از همه دستگاه‌ها با نامعتبر کردن تمام توکن‌های فعال کاربر.
+            Logs out a user from all devices by invalidating all active tokens for the user.
+            </summary>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IMembershipService.RefreshTokenAsync(System.String)">
+            <summary>
+            تازه‌سازی توکن با استفاده از توکن تازه‌سازی ارائه شده.
+            Refreshes the authentication token using the provided refresh token.
+            </summary>
+            <param name="refreshToken"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IMembershipService.GetUserAsync(System.Int32)">
+            <summary>
+            دریافت اطلاعات کاربر با شناسه داده شده.
+            Retrieves user information by the given user ID.
+            </summary>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IMembershipService.UpdateUserAsync(System.Int32,ZA_Membership.Models.DTOs.UpdateUserDto)">
+            <summary>
+            به‌روزرسانی اطلاعات کاربر با شناسه داده شده.
+            Updates user information for the given user ID.
+            </summary>
+            <param name="userId"></param>
+            <param name="updateDto"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IMembershipService.ChangePasswordAsync(System.Int32,ZA_Membership.Models.DTOs.ChangePasswordDto)">
+            <summary>
+            تغییر رمز عبور کاربر با شناسه داده شده.
+            Changes the password for the user with the given user ID.
+            </summary>
+            <param name="userId"></param>
+            <param name="changePasswordDto"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IMembershipService.DeactivateUserAsync(System.Int32)">
+            <summary>
+            غیرفعال‌سازی حساب کاربری با شناسه داده شده.
+            Deactivates the user account with the given user ID.
+            </summary>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IMembershipService.ActivateUserAsync(System.Int32)">
+            <summary>
+            فعال‌سازی حساب کاربری با شناسه داده شده.
+            Activates the user account with the given user ID.
+            </summary>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IMembershipService.AssignRoleAsync(System.Int32,System.String)">
+            <summary>
+            اختصاص نقش به کاربر با شناسه داده شده.
+            Assigns a role to the user with the given user ID.
+            </summary>
+            <param name="userId"></param>
+            <param name="roleName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IMembershipService.RemoveRoleAsync(System.Int32,System.String)">
+            <summary>
+            حذف نقش از کاربر با شناسه داده شده.
+            Removes a role from the user with the given user ID.
+            </summary>
+            <param name="userId"></param>
+            <param name="roleName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IMembershipService.GetUserRolesAsync(System.Int32)">
+            <summary>
+            دریافت نقش‌های کاربر با شناسه داده شده.
+            Retrieves the roles of the user with the given user ID.
+            </summary>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IMembershipService.GetUserPermissionsAsync(System.Int32)">
+            <summary>
+            دریافت مجوزهای کاربر با شناسه داده شده.
+            Retrieves the permissions of the user with the given user ID.
+            </summary>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IMembershipService.HasPermissionAsync(System.Int32,System.String)">
+            <summary>
+            بررسی اینکه آیا کاربر با شناسه داده شده دارای مجوز مشخص شده است یا خیر.
+            Checks if the user with the given user ID has the specified permission.
+            </summary>
+            <param name="userId"></param>
+            <param name="permission"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IMembershipService.IsInRoleAsync(System.Int32,System.String)">
+            <summary>
+            بررسی اینکه آیا کاربر با شناسه داده شده دارای نقش مشخص شده است یا خیر.
+            Checks if the user with the given user ID has the specified role.
+            </summary>
+            <param name="userId"></param>
+            <param name="roleName"></param>
+            <returns></returns>
+        </member>
+        <member name="T:ZA_Membership.Services.Interfaces.IRoleRepository">
+            <summary>
+            Repository interface for managing Role entities.
+            </summary>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IRoleRepository.GetByIdAsync(System.Int32)">
+            <summary>
+            دریافت نقش بر اساس شناسه
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IRoleRepository.GetByNameAsync(System.String)">
+            <summary>
+            دریافت نقش بر اساس نام
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IRoleRepository.GetAllAsync">
+            <summary>
+            دریافت همه نقش‌ها
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IRoleRepository.CreateAsync(ZA_Membership.Models.Entities.Role)">
+            <summary>
+            ایجاد نقش جدید
+            </summary>
+            <param name="role"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IRoleRepository.UpdateAsync(ZA_Membership.Models.Entities.Role)">
+            <summary>
+            به‌روزرسانی اطلاعات نقش
+            </summary>
+            <param name="role"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IRoleRepository.DeleteAsync(System.Int32)">
+            <summary>
+            حذف نقش بر اساس شناسه
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IRoleRepository.ExistsAsync(System.Int32)">
+            <summary>
+            بررسی وجود نقش بر اساس شناسه
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IRoleRepository.ExistsByNameAsync(System.String)">
+            <summary>
+            بررسی وجود نقش بر اساس نام
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="T:ZA_Membership.Services.Interfaces.IUserRepository">
+            <summary>
+            Repository interface for managing User entities.
+            </summary>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IUserRepository.GetByIdAsync(System.Int32)">
+            <summary>
+            دریافت کاربر بر اساس شناسه
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IUserRepository.GetByUsernameAsync(System.String)">
+            <summary>
+            دریافت کاربر بر اساس نام کاربری
+            </summary>
+            <param name="username"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IUserRepository.GetByEmailAsync(System.String)">
+            <summary>
+            دریافت کاربر بر اساس ایمیل
+            </summary>
+            <param name="email"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IUserRepository.GetByUsernameOrEmailAsync(System.String)">
+            <summary>
+            دریافت کاربر بر اساس نام کاربری یا ایمیل
+            </summary>
+            <param name="usernameOrEmail"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IUserRepository.CreateAsync(ZA_Membership.Models.Entities.User)">
+            <summary>
+            ایجاد کاربر جدید
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IUserRepository.UpdateAsync(ZA_Membership.Models.Entities.User)">
+            <summary>
+            به‌روزرسانی اطلاعات کاربر
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IUserRepository.DeleteAsync(System.Int32)">
+            <summary>
+            حذف کاربر بر اساس شناسه
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IUserRepository.ExistsAsync(System.Int32)">
+            <summary>
+            بررسی وجود کاربر بر اساس شناسه
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IUserRepository.ExistsByUsernameAsync(System.String)">
+            <summary>
+            بررسی وجود کاربر بر اساس نام کاربری
+            </summary>
+            <param name="username"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IUserRepository.ExistsByEmailAsync(System.String)">
+            <summary>
+            بررسی وجود کاربر بر اساس ایمیل
+            </summary>
+            <param name="email"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IUserRepository.GetUserRolesAsync(System.Int32)">
+            <summary>
+            دریافت نقش‌ها و مجوزهای کاربر بر اساس شناسه
+            </summary>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IUserRepository.GetUserPermissionsAsync(System.Int32)">
+            <summary>
+            دریافت مجوزهای کاربر بر اساس شناسه
+            </summary>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="T:ZA_Membership.Services.Interfaces.IUserTokenRepository">
+            <summary>
+            Repository interface for managing UserToken entities.
+            </summary>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IUserTokenRepository.GetByTokenAsync(System.String)">
+            <summary>
+            دریافت توکن کاربر بر اساس شناسه
+            </summary>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IUserTokenRepository.CreateAsync(ZA_Membership.Models.Entities.UserToken)">
+            <summary>
+            ایجاد توکن جدید برای کاربر
+            </summary>
+            <param name="userToken"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IUserTokenRepository.UpdateAsync(ZA_Membership.Models.Entities.UserToken)">
+            <summary>
+            به‌روزرسانی اطلاعات توکن کاربر
+            </summary>
+            <param name="userToken"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IUserTokenRepository.DeleteAsync(System.Int32)">
+            <summary>
+            حذف توکن کاربر بر اساس شناسه
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IUserTokenRepository.DeleteByUserIdAsync(System.Int32)">
+            <summary>
+            حذف همه توکن‌های یک کاربر بر اساس شناسه کاربر
+            </summary>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IUserTokenRepository.RevokeTokenAsync(System.String)">
+            <summary>
+            بررسی وجود توکن کاربر بر اساس شناسه
+            </summary>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IUserTokenRepository.RevokeAllUserTokensAsync(System.Int32)">
+            <summary>
+            ابطلی همه توکن‌های فعال یک کاربر بر اساس شناسه کاربر
+            </summary>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZA_Membership.Services.Interfaces.IUserTokenRepository.GetUserActiveTokensAsync(System.Int32)">
+            <summary>
+            دریافت همه توکن‌های فعال یک کاربر بر اساس شناسه کاربر
+            </summary>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
     </members>
 </doc>

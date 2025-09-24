@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCopyrightAttribute("Copyright (c) 2025 ZA Solutions")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("کتابخانه مدیریت عضویت، احراز هویت و نقش‌ها برای ASP.NET Core")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a730c2d4960371e5b4483aa99bfda3068438605f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+154bc9556248538498f79ede5c7e303273360012")]
 [assembly: System.Reflection.AssemblyProductAttribute("ZA_Membership")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ZA_Membership")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

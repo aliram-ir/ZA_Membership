@@ -4,6 +4,9 @@ using ZA_Membership.Models.Entities;
 using ZA_Membership.Models.Results;
 using ZA_Membership.Security;
 using ZA_Membership.Services.Interfaces;
+using ZA_Membership.Resources;
+using System.Globalization;
+using System.Resources;
 
 namespace ZA_Membership.Services.Implementations
 {
@@ -18,6 +21,7 @@ namespace ZA_Membership.Services.Implementations
         private readonly IJwtTokenService _jwtTokenService;
         private readonly IPasswordService _passwordService;
         private readonly MembershipOptions _options;
+        private readonly ResourceManager _rm = new ResourceManager(typeof(Messages));
 
         /// <summary>
         /// Constructor for MembershipService.
@@ -44,6 +48,7 @@ namespace ZA_Membership.Services.Implementations
             _options = options;
         }
 
+
         /// <inheritdoc/>
         public async Task<AuthResult> RegisterAsync(RegisterDto registerDto)
         {
@@ -56,7 +61,7 @@ namespace ZA_Membership.Services.Implementations
                     {
                         IsSuccess = false,
                         Errors = passwordErrors,
-                        Message = "رمز عبور نامعتبر است"
+                        Message = _rm.GetString("Password_Invalid", CultureInfo.CurrentUICulture) ?? "Invalid password"
                     };
                 }
 
@@ -66,19 +71,20 @@ namespace ZA_Membership.Services.Implementations
                     return new AuthResult
                     {
                         IsSuccess = false,
-                        Errors = new List<string> { "نام کاربری قبلاً استفاده شده است" },
-                        Message = "خطا در ثبت نام"
+                        Errors = [_rm.GetString("Username_AlreadyExists", CultureInfo.CurrentUICulture) ?? "Username already exists"],
+                        Message = _rm.GetString("Register_Failed", CultureInfo.CurrentUICulture) ?? "Registration failed"
                     };
                 }
 
                 // Check if email exists
-                if (_options.User.RequireUniqueEmail && await _userRepository.ExistsByEmailAsync(registerDto.Email))
+                if (_options.User.RequireUniqueEmail && await _userRepository.ExistsByEmailAsync(registerDto.Email ?? ""))
                 {
                     return new AuthResult
                     {
                         IsSuccess = false,
-                        Errors = new List<string> { "ایمیل قبلاً استفاده شده است" },
-                        Message = "خطا در ثبت نام"
+                        Errors = new List<string>
+                        { _rm.GetString("Email_AlreadyExists", CultureInfo.CurrentUICulture) ?? "Email already exists" },
+                        Message = _rm.GetString("Register_Failed", CultureInfo.CurrentUICulture) ?? "Registration failed"
                     };
                 }
 
@@ -86,7 +92,7 @@ namespace ZA_Membership.Services.Implementations
                 var user = new User
                 {
                     Username = registerDto.Username,
-                    Email = registerDto.Email,
+                    Email = registerDto.Email ?? string.Empty,
                     PasswordHash = _passwordService.HashPassword(registerDto.Password),
                     FirstName = registerDto.FirstName,
                     LastName = registerDto.LastName,
@@ -99,13 +105,11 @@ namespace ZA_Membership.Services.Implementations
 
                 var createdUser = await _userRepository.CreateAsync(user);
 
-                // Generate tokens
                 var roles = await _userRepository.GetUserRolesAsync(createdUser.Id);
                 var permissions = await _userRepository.GetUserPermissionsAsync(createdUser.Id);
                 var accessToken = _jwtTokenService.GenerateAccessToken(createdUser, roles, permissions);
                 var refreshToken = _jwtTokenService.GenerateRefreshToken();
 
-                // Save refresh token
                 var userToken = new UserToken
                 {
                     UserId = createdUser.Id,
@@ -126,20 +130,21 @@ namespace ZA_Membership.Services.Implementations
                     RefreshToken = refreshToken,
                     ExpiresAt = _jwtTokenService.GetTokenExpiration(accessToken),
                     User = userDto,
-                    Message = "ثبت نام با موفقیت انجام شد"
+                    Message = _rm.GetString("Register_Success", CultureInfo.CurrentUICulture) ?? "Registration successful"
                 };
             }
-            catch (Exception ex)
+            catch
             {
                 return new AuthResult
                 {
                     IsSuccess = false,
-                    Errors = new List<string> { "خطای سیستمی رخ داده است" },
-                    Message = "خطا در ثبت نام"
+                    Errors = new List<string>
+                    { _rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred" },
+                    Message = _rm.GetString("Register_Failed", CultureInfo.CurrentUICulture) ?? "Registration failed"
                 };
             }
         }
-
+        /// <inheritdoc/>
         public async Task<AuthResult> LoginAsync(LoginDto loginDto, string? ipAddress = null, string? deviceInfo = null)
         {
             try
@@ -151,8 +156,9 @@ namespace ZA_Membership.Services.Implementations
                     return new AuthResult
                     {
                         IsSuccess = false,
-                        Errors = new List<string> { "نام کاربری یا رمز عبور اشتباه است" },
-                        Message = "خطا در ورود"
+                        Errors = new List<string>
+                        { _rm.GetString("Login_InvalidCredentials", CultureInfo.CurrentUICulture) ?? "Invalid username or password" },
+                        Message = _rm.GetString("Login_Failed", CultureInfo.CurrentUICulture) ?? "Login failed"
                     };
                 }
 
@@ -161,22 +167,20 @@ namespace ZA_Membership.Services.Implementations
                     return new AuthResult
                     {
                         IsSuccess = false,
-                        Errors = new List<string> { "نام کاربری یا رمز عبور اشتباه است" },
-                        Message = "خطا در ورود"
+                        Errors = new List<string>
+                        { _rm.GetString("Login_InvalidCredentials", CultureInfo.CurrentUICulture) ?? "Invalid username or password" },
+                        Message = _rm.GetString("Login_Failed", CultureInfo.CurrentUICulture) ?? "Login failed"
                     };
                 }
 
-                // Update last login
                 user.LastLoginAt = DateTime.UtcNow;
                 await _userRepository.UpdateAsync(user);
 
-                // Generate tokens
                 var roles = await _userRepository.GetUserRolesAsync(user.Id);
                 var permissions = await _userRepository.GetUserPermissionsAsync(user.Id);
                 var accessToken = _jwtTokenService.GenerateAccessToken(user, roles, permissions);
                 var refreshToken = _jwtTokenService.GenerateRefreshToken();
 
-                // Save refresh token
                 var userToken = new UserToken
                 {
                     UserId = user.Id,
@@ -199,47 +203,52 @@ namespace ZA_Membership.Services.Implementations
                     RefreshToken = refreshToken,
                     ExpiresAt = _jwtTokenService.GetTokenExpiration(accessToken),
                     User = userDto,
-                    Message = "ورود با موفقیت انجام شد"
+                    Message = _rm.GetString("Login_Success", CultureInfo.CurrentUICulture) ?? "Login successful"
                 };
             }
-            catch (Exception ex)
+            catch
             {
                 return new AuthResult
                 {
                     IsSuccess = false,
-                    Errors = new List<string> { "خطای سیستمی رخ داده است" },
-                    Message = "خطا در ورود"
+                    Errors = new List<string>
+                    { _rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred" },
+                    Message = _rm.GetString("Login_Failed", CultureInfo.CurrentUICulture) ?? "Login failed"
                 };
             }
         }
-
+        /// <inheritdoc/>
         public async Task<ServiceResult> LogoutAsync(string token)
         {
             try
             {
                 await _tokenRepository.RevokeTokenAsync(token);
-                return ServiceResult.Success("خروج با موفقیت انجام شد");
+                return ServiceResult.Success(_rm.GetString("Logout_Success", CultureInfo.CurrentUICulture) ?? "Logout successful");
             }
-            catch (Exception ex)
+            catch
             {
-                return ServiceResult.Failure("خطای سیستمی رخ داده است", "خطا در خروج");
+                return ServiceResult.Failure(
+                    _rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred",
+                    _rm.GetString("Logout_Failed", CultureInfo.CurrentUICulture) ?? "Logout failed"
+                );
             }
         }
-
+        /// <inheritdoc/>
         public async Task<ServiceResult> LogoutAllDevicesAsync(int userId)
         {
             try
             {
                 await _tokenRepository.RevokeAllUserTokensAsync(userId);
-                return ServiceResult.Success("خروج از همه دستگاه‌ها با موفقیت انجام شد");
+                return ServiceResult.Success(_rm.GetString("LogoutAllDevices_Success", CultureInfo.CurrentUICulture) ?? "Logged out from all devices successfully");
             }
-            catch (Exception ex)
+            catch
             {
-                return ServiceResult.Failure("خطای سیستمی رخ داده است", "خطا در خروج");
+                return ServiceResult.Failure(
+                    _rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred",
+                    _rm.GetString("Logout_Failed", CultureInfo.CurrentUICulture) ?? "Logout failed"
+                );
             }
         }
-
-        // سایر متدها...
 
         private UserDto MapToUserDto(User user, List<string> roles, List<string> permissions)
         {
@@ -260,9 +269,7 @@ namespace ZA_Membership.Services.Implementations
                 Permissions = permissions
             };
         }
-
-        // ادامه Services/Implementations/MembershipService.cs
-
+        /// <inheritdoc/>
         public async Task<AuthResult> RefreshTokenAsync(string refreshToken)
         {
             try
@@ -274,8 +281,9 @@ namespace ZA_Membership.Services.Implementations
                     return new AuthResult
                     {
                         IsSuccess = false,
-                        Errors = new List<string> { "توکن نامعتبر یا منقضی شده است" },
-                        Message = "خطا در بازآوری توکن"
+                        Errors = new List<string>
+                        { _rm.GetString("RefreshToken_Invalid", CultureInfo.CurrentUICulture) ?? "Invalid or expired token" },
+                        Message = _rm.GetString("RefreshToken_Failed", CultureInfo.CurrentUICulture) ?? "Refresh token failed"
                     };
                 }
 
@@ -285,21 +293,19 @@ namespace ZA_Membership.Services.Implementations
                     return new AuthResult
                     {
                         IsSuccess = false,
-                        Errors = new List<string> { "کاربر یافت نشد یا غیرفعال است" },
-                        Message = "خطا در بازآوری توکن"
+                        Errors = new List<string>
+                        { _rm.GetString("User_NotFoundOrInactive", CultureInfo.CurrentUICulture) ?? "User not found or inactive" },
+                        Message = _rm.GetString("RefreshToken_Failed", CultureInfo.CurrentUICulture) ?? "Refresh token failed"
                     };
                 }
 
-                // Revoke old refresh token
                 await _tokenRepository.RevokeTokenAsync(refreshToken);
 
-                // Generate new tokens
                 var roles = await _userRepository.GetUserRolesAsync(user.Id);
                 var permissions = await _userRepository.GetUserPermissionsAsync(user.Id);
                 var newAccessToken = _jwtTokenService.GenerateAccessToken(user, roles, permissions);
                 var newRefreshToken = _jwtTokenService.GenerateRefreshToken();
 
-                // Save new refresh token
                 var newUserToken = new UserToken
                 {
                     UserId = user.Id,
@@ -322,20 +328,21 @@ namespace ZA_Membership.Services.Implementations
                     RefreshToken = newRefreshToken,
                     ExpiresAt = _jwtTokenService.GetTokenExpiration(newAccessToken),
                     User = userDto,
-                    Message = "توکن با موفقیت بازآوری شد"
+                    Message = _rm.GetString("RefreshToken_Success", CultureInfo.CurrentUICulture) ?? "Token refreshed successfully"
                 };
             }
-            catch (Exception ex)
+            catch
             {
                 return new AuthResult
                 {
                     IsSuccess = false,
-                    Errors = new List<string> { "خطای سیستمی رخ داده است" },
-                    Message = "خطا در بازآوری توکن"
+                    Errors = new List<string>
+                    { _rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred" },
+                    Message = _rm.GetString("RefreshToken_Failed", CultureInfo.CurrentUICulture) ?? "Refresh token failed"
                 };
             }
         }
-
+        /// <inheritdoc/>
         public async Task<ServiceResult<UserDto>> GetUserAsync(int userId)
         {
             try
@@ -343,7 +350,7 @@ namespace ZA_Membership.Services.Implementations
                 var user = await _userRepository.GetByIdAsync(userId);
                 if (user == null)
                 {
-                    return ServiceResult<UserDto>.Failure("کاربر یافت نشد");
+                    return ServiceResult<UserDto>.Failure(_rm.GetString("User_NotFound", CultureInfo.CurrentUICulture) ?? "User not found");
                 }
 
                 var roles = await _userRepository.GetUserRolesAsync(userId);
@@ -352,12 +359,12 @@ namespace ZA_Membership.Services.Implementations
 
                 return ServiceResult<UserDto>.Success(userDto);
             }
-            catch (Exception ex)
+            catch
             {
-                return ServiceResult<UserDto>.Failure("خطای سیستمی رخ داده است");
+                return ServiceResult<UserDto>.Failure(_rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred");
             }
         }
-
+        /// <inheritdoc/>
         public async Task<ServiceResult<UserDto>> UpdateUserAsync(int userId, UpdateUserDto updateDto)
         {
             try
@@ -365,21 +372,19 @@ namespace ZA_Membership.Services.Implementations
                 var user = await _userRepository.GetByIdAsync(userId);
                 if (user == null)
                 {
-                    return ServiceResult<UserDto>.Failure("کاربر یافت نشد");
+                    return ServiceResult<UserDto>.Failure(_rm.GetString("User_NotFound", CultureInfo.CurrentUICulture) ?? "User not found");
                 }
 
-                // Check email uniqueness if changed
                 if (!string.IsNullOrEmpty(updateDto.Email) &&
                     updateDto.Email != user.Email &&
                     _options.User.RequireUniqueEmail)
                 {
                     if (await _userRepository.ExistsByEmailAsync(updateDto.Email))
                     {
-                        return ServiceResult<UserDto>.Failure("این ایمیل قبلاً استفاده شده است");
+                        return ServiceResult<UserDto>.Failure(_rm.GetString("Email_AlreadyExists", CultureInfo.CurrentUICulture) ?? "Email already exists");
                     }
                 }
 
-                // Update user properties
                 user.FirstName = updateDto.FirstName ?? user.FirstName;
                 user.LastName = updateDto.LastName ?? user.LastName;
                 user.PhoneNumber = updateDto.PhoneNumber ?? user.PhoneNumber;
@@ -388,7 +393,7 @@ namespace ZA_Membership.Services.Implementations
                 if (!string.IsNullOrEmpty(updateDto.Email) && updateDto.Email != user.Email)
                 {
                     user.Email = updateDto.Email;
-                    user.EmailConfirmed = false; // Reset email confirmation
+                    user.EmailConfirmed = false;
                 }
 
                 var updatedUser = await _userRepository.UpdateAsync(user);
@@ -396,14 +401,15 @@ namespace ZA_Membership.Services.Implementations
                 var permissions = await _userRepository.GetUserPermissionsAsync(userId);
                 var userDto = MapToUserDto(updatedUser, roles, permissions);
 
-                return ServiceResult<UserDto>.Success(userDto, "اطلاعات کاربر با موفقیت به‌روزرسانی شد");
+                return ServiceResult<UserDto>.Success(userDto,
+                    _rm.GetString("User_UpdateSuccess", CultureInfo.CurrentUICulture) ?? "User updated successfully");
             }
-            catch (Exception ex)
+            catch
             {
-                return ServiceResult<UserDto>.Failure("خطای سیستمی رخ داده است");
+                return ServiceResult<UserDto>.Failure(_rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred");
             }
         }
-
+        /// <inheritdoc/>
         public async Task<ServiceResult> ChangePasswordAsync(int userId, ChangePasswordDto changePasswordDto)
         {
             try
@@ -411,37 +417,33 @@ namespace ZA_Membership.Services.Implementations
                 var user = await _userRepository.GetByIdAsync(userId);
                 if (user == null)
                 {
-                    return ServiceResult.Failure("کاربر یافت نشد");
+                    return ServiceResult.Failure(_rm.GetString("User_NotFound", CultureInfo.CurrentUICulture) ?? "User not found");
                 }
 
-                // Verify current password
                 if (!_passwordService.VerifyPassword(changePasswordDto.CurrentPassword, user.PasswordHash))
                 {
-                    return ServiceResult.Failure("رمز عبور فعلی اشتباه است");
+                    return ServiceResult.Failure(_rm.GetString("Password_CurrentInvalid", CultureInfo.CurrentUICulture) ?? "Current password is incorrect");
                 }
 
-                // Validate new password
                 if (!_passwordService.ValidatePassword(changePasswordDto.NewPassword, out var passwordErrors))
                 {
-                    return ServiceResult.Failure(passwordErrors, "رمز عبور جدید نامعتبر است");
+                    return ServiceResult.Failure(passwordErrors, _rm.GetString("Password_NewInvalid", CultureInfo.CurrentUICulture) ?? "New password is invalid");
                 }
 
-                // Update password
                 user.PasswordHash = _passwordService.HashPassword(changePasswordDto.NewPassword);
                 user.UpdatedAt = DateTime.UtcNow;
                 await _userRepository.UpdateAsync(user);
 
-                // Revoke all tokens (force re-login)
                 await _tokenRepository.RevokeAllUserTokensAsync(userId);
 
-                return ServiceResult.Success("رمز عبور با موفقیت تغییر کرد");
+                return ServiceResult.Success(_rm.GetString("Password_ChangeSuccess", CultureInfo.CurrentUICulture) ?? "Password changed successfully");
             }
-            catch (Exception ex)
+            catch
             {
-                return ServiceResult.Failure("خطای سیستمی رخ داده است");
+                return ServiceResult.Failure(_rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred");
             }
         }
-
+        /// <inheritdoc/>
         public async Task<ServiceResult> DeactivateUserAsync(int userId)
         {
             try
@@ -449,24 +451,23 @@ namespace ZA_Membership.Services.Implementations
                 var user = await _userRepository.GetByIdAsync(userId);
                 if (user == null)
                 {
-                    return ServiceResult.Failure("کاربر یافت نشد");
+                    return ServiceResult.Failure(_rm.GetString("User_NotFound", CultureInfo.CurrentUICulture) ?? "User not found");
                 }
 
                 user.IsActive = false;
                 user.UpdatedAt = DateTime.UtcNow;
                 await _userRepository.UpdateAsync(user);
 
-                // Revoke all tokens
                 await _tokenRepository.RevokeAllUserTokensAsync(userId);
 
-                return ServiceResult.Success("کاربر با موفقیت غیرفعال شد");
+                return ServiceResult.Success(_rm.GetString("User_DeactivateSuccess", CultureInfo.CurrentUICulture) ?? "User deactivated successfully");
             }
-            catch (Exception ex)
+            catch
             {
-                return ServiceResult.Failure("خطای سیستمی رخ داده است");
+                return ServiceResult.Failure(_rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred");
             }
         }
-
+        /// <inheritdoc/>
         public async Task<ServiceResult> ActivateUserAsync(int userId)
         {
             try
@@ -474,21 +475,21 @@ namespace ZA_Membership.Services.Implementations
                 var user = await _userRepository.GetByIdAsync(userId);
                 if (user == null)
                 {
-                    return ServiceResult.Failure("کاربر یافت نشد");
+                    return ServiceResult.Failure(_rm.GetString("User_NotFound", CultureInfo.CurrentUICulture) ?? "User not found");
                 }
 
                 user.IsActive = true;
                 user.UpdatedAt = DateTime.UtcNow;
                 await _userRepository.UpdateAsync(user);
 
-                return ServiceResult.Success("کاربر با موفقیت فعال شد");
+                return ServiceResult.Success(_rm.GetString("User_ActivateSuccess", CultureInfo.CurrentUICulture) ?? "User activated successfully");
             }
-            catch (Exception ex)
+            catch
             {
-                return ServiceResult.Failure("خطای سیستمی رخ داده است");
+                return ServiceResult.Failure(_rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred");
             }
         }
-
+        /// <inheritdoc/>
         public async Task<ServiceResult> AssignRoleAsync(int userId, string roleName)
         {
             try
@@ -496,32 +497,34 @@ namespace ZA_Membership.Services.Implementations
                 var user = await _userRepository.GetByIdAsync(userId);
                 if (user == null)
                 {
-                    return ServiceResult.Failure("کاربر یافت نشد");
+                    return ServiceResult.Failure(_rm.GetString("User_NotFound", CultureInfo.CurrentUICulture) ?? "User not found");
                 }
 
                 var role = await _roleRepository.GetByNameAsync(roleName);
                 if (role == null)
                 {
-                    return ServiceResult.Failure("نقش یافت نشد");
+                    return ServiceResult.Failure(_rm.GetString("Role_NotFound", CultureInfo.CurrentUICulture) ?? "Role not found");
                 }
 
                 var userRoles = await _userRepository.GetUserRolesAsync(userId);
                 if (userRoles.Contains(roleName))
                 {
-                    return ServiceResult.Failure("این نقش قبلاً به کاربر اختصاص داده شده است");
+                    return ServiceResult.Failure(_rm.GetString("Role_AlreadyAssigned", CultureInfo.CurrentUICulture) ?? "Role already assigned to user");
                 }
 
-                // Implementation would depend on your UserRole repository
-                // This is just a placeholder - you'd implement this in your host project
+                // Implementation in host project
 
-                return ServiceResult.Success($"نقش {roleName} با موفقیت به کاربر اختصاص داده شد");
+                return ServiceResult.Success(string.Format(
+                    _rm.GetString("Role_AssignSuccess", CultureInfo.CurrentUICulture) ?? "Role {0} assigned successfully to user",
+                    roleName
+                ));
             }
-            catch (Exception ex)
+            catch
             {
-                return ServiceResult.Failure("خطای سیستمی رخ داده است");
+                return ServiceResult.Failure(_rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred");
             }
         }
-
+        /// <inheritdoc/>
         public async Task<ServiceResult> RemoveRoleAsync(int userId, string roleName)
         {
             try
@@ -529,25 +532,28 @@ namespace ZA_Membership.Services.Implementations
                 var user = await _userRepository.GetByIdAsync(userId);
                 if (user == null)
                 {
-                    return ServiceResult.Failure("کاربر یافت نشد");
+                    return ServiceResult.Failure(_rm.GetString("User_NotFound", CultureInfo.CurrentUICulture) ?? "User not found");
                 }
 
                 var userRoles = await _userRepository.GetUserRolesAsync(userId);
                 if (!userRoles.Contains(roleName))
                 {
-                    return ServiceResult.Failure("این نقش به کاربر اختصاص داده نشده است");
+                    return ServiceResult.Failure(_rm.GetString("Role_NotAssigned", CultureInfo.CurrentUICulture) ?? "Role not assigned to user");
                 }
 
-                // Implementation would depend on your UserRole repository
+                // Implementation in host project
 
-                return ServiceResult.Success($"نقش {roleName} با موفقیت از کاربر حذف شد");
+                return ServiceResult.Success(string.Format(
+                    _rm.GetString("Role_RemoveSuccess", CultureInfo.CurrentUICulture) ?? "Role {0} removed successfully from user",
+                    roleName
+                ));
             }
-            catch (Exception ex)
+            catch
             {
-                return ServiceResult.Failure("خطای سیستمی رخ داده است");
+                return ServiceResult.Failure(_rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred");
             }
         }
-
+        /// <inheritdoc/>
         public async Task<ServiceResult<List<string>>> GetUserRolesAsync(int userId)
         {
             try
@@ -555,18 +561,18 @@ namespace ZA_Membership.Services.Implementations
                 var user = await _userRepository.GetByIdAsync(userId);
                 if (user == null)
                 {
-                    return ServiceResult<List<string>>.Failure("کاربر یافت نشد");
+                    return ServiceResult<List<string>>.Failure(_rm.GetString("User_NotFound", CultureInfo.CurrentUICulture) ?? "User not found");
                 }
 
                 var roles = await _userRepository.GetUserRolesAsync(userId);
                 return ServiceResult<List<string>>.Success(roles);
             }
-            catch (Exception ex)
+            catch
             {
-                return ServiceResult<List<string>>.Failure("خطای سیستمی رخ داده است");
+                return ServiceResult<List<string>>.Failure(_rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred");
             }
         }
-
+        /// <inheritdoc/>
         public async Task<ServiceResult<List<string>>> GetUserPermissionsAsync(int userId)
         {
             try
@@ -574,18 +580,18 @@ namespace ZA_Membership.Services.Implementations
                 var user = await _userRepository.GetByIdAsync(userId);
                 if (user == null)
                 {
-                    return ServiceResult<List<string>>.Failure("کاربر یافت نشد");
+                    return ServiceResult<List<string>>.Failure(_rm.GetString("User_NotFound", CultureInfo.CurrentUICulture) ?? "User not found");
                 }
 
                 var permissions = await _userRepository.GetUserPermissionsAsync(userId);
                 return ServiceResult<List<string>>.Success(permissions);
             }
-            catch (Exception ex)
+            catch
             {
-                return ServiceResult<List<string>>.Failure("خطای سیستمی رخ داده است");
+                return ServiceResult<List<string>>.Failure(_rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred");
             }
         }
-
+        /// <inheritdoc/>
         public async Task<ServiceResult<bool>> HasPermissionAsync(int userId, string permission)
         {
             try
@@ -594,12 +600,12 @@ namespace ZA_Membership.Services.Implementations
                 var hasPermission = permissions.Contains(permission);
                 return ServiceResult<bool>.Success(hasPermission);
             }
-            catch (Exception ex)
+            catch
             {
-                return ServiceResult<bool>.Failure("خطای سیستمی رخ داده است");
+                return ServiceResult<bool>.Failure(_rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred");
             }
         }
-
+        /// <inheritdoc/>
         public async Task<ServiceResult<bool>> IsInRoleAsync(int userId, string roleName)
         {
             try
@@ -608,11 +614,10 @@ namespace ZA_Membership.Services.Implementations
                 var isInRole = roles.Contains(roleName);
                 return ServiceResult<bool>.Success(isInRole);
             }
-            catch (Exception ex)
+            catch
             {
-                return ServiceResult<bool>.Failure("خطای سیستمی رخ داده است");
+                return ServiceResult<bool>.Failure(_rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred");
             }
         }
     }
 }
-

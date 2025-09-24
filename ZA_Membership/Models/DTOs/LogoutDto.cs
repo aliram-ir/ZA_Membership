@@ -8,14 +8,18 @@ namespace ZA_Membership.Models.DTOs
     public class LogoutDto
     {
         /// <summary>
-        /// The refresh token to be invalidated during logout.
+        /// Initializes a new instance of the <see cref="LogoutDto"/> class.
         /// </summary>
-        [Required]
-        public LogoutDto(string refreshToken) 
+        /// <param name="refreshToken"></param>
+        public LogoutDto(string refreshToken)
         {
             this.RefreshToken = refreshToken;
-   
         }
-                public string RefreshToken { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The refresh token used to invalidate the user's session.
+        /// </summary>
+        [Required(ErrorMessageResourceName = "RefreshToken_Required", ErrorMessageResourceType = typeof(Resources.Messages))]
+        public string RefreshToken { get; set; } = string.Empty;
     }
 }

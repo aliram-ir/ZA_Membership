@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Resources;
 using BCrypt.Net;
 using ZA_Membership.Configuration;
 
@@ -68,24 +70,41 @@ namespace ZA_Membership.Security
         /// <inheritdoc/>
         public bool ValidatePassword(string password, out List<string> errors)
         {
-            errors = [];
+            errors = new List<string>();
 
-            if (password.Length < _options.Password.MinimumLength)
-                errors.Add($"رمز عبور باید حداقل {_options.Password.MinimumLength} کاراکتر باشد");
+            var rm = new ResourceManager("ZA_Membership.Resources.Messages",
+                                         typeof(PasswordService).Assembly);
+            var culture = CultureInfo.CurrentUICulture;
 
-            if (_options.Password.RequireUppercase && !password.Any(char.IsUpper))
-                errors.Add("رمز عبور باید حداقل یک حرف بزرگ داشته باشد");
+            string? msg;
 
-            if (_options.Password.RequireLowercase && !password.Any(char.IsLower))
-                errors.Add("رمز عبور باید حداقل یک حرف کوچک داشته باشد");
+            // حداقل طول
+            msg = rm.GetString("Password_MinimumLength", culture);
+            if (password.Length < _options.Password.MinimumLength && !string.IsNullOrEmpty(msg))
+                errors.Add(string.Format(msg, _options.Password.MinimumLength));
 
-            if (_options.Password.RequireDigit && !password.Any(char.IsDigit))
-                errors.Add("رمز عبور باید حداقل یک عدد داشته باشد");
+            // حرف بزرگ
+            msg = rm.GetString("Password_RequireUppercase", culture);
+            if (_options.Password.RequireUppercase && !password.Any(char.IsUpper) && !string.IsNullOrEmpty(msg))
+                errors.Add(msg);
 
-            if (_options.Password.RequireSpecialCharacter && !password.Any(ch => !char.IsLetterOrDigit(ch)))
-                errors.Add("رمز عبور باید حداقل یک کاراکتر خاص داشته باشد");
+            // حرف کوچک
+            msg = rm.GetString("Password_RequireLowercase", culture);
+            if (_options.Password.RequireLowercase && !password.Any(char.IsLower) && !string.IsNullOrEmpty(msg))
+                errors.Add(msg);
+
+            // عدد
+            msg = rm.GetString("Password_RequireDigit", culture);
+            if (_options.Password.RequireDigit && !password.Any(char.IsDigit) && !string.IsNullOrEmpty(msg))
+                errors.Add(msg);
+
+            // کاراکتر خاص
+            msg = rm.GetString("Password_RequireSpecialChar", culture);
+            if (_options.Password.RequireSpecialCharacter && !password.Any(ch => !char.IsLetterOrDigit(ch)) && !string.IsNullOrEmpty(msg))
+                errors.Add(msg);
 
             return errors.Count == 0;
         }
+
     }
 }

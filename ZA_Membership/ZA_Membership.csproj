@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
 
     <PackageId>ZA.Membership</PackageId>
-    <PackageVersion>1.0.1</PackageVersion>
+    <PackageVersion>1.0.2</PackageVersion>
     <Authors>Ali Ramezani</Authors>
     <Company>Zarinafzar - ZA</Company>
     <Description>کتابخانه مدیریت عضویت، احراز هویت و نقش‌ها برای ASP.NET Core</Description>
@@ -40,6 +40,6 @@
     <None Include="images\icon.png" Pack="true" PackagePath="" />
     <None Include="LICENSE" Pack="true" PackagePath="\" />
   </ItemGroup>
-  
+
 
 </Project>

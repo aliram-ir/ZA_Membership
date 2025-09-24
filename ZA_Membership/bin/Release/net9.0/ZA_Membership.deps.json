@@ -18,6 +18,11 @@
         },
         "runtime": {
           "ZA_Membership.dll": {}
+        },
+        "resources": {
+          "fa/ZA_Membership.resources.dll": {
+            "locale": "fa"
+          }
         }
       },
       "BCrypt.Net-Next/4.0.3": {
