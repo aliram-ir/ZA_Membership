@@ -11,8 +11,8 @@
     <Company>Zarinafzar - ZA</Company>
     <Description>کتابخانه مدیریت عضویت، احراز هویت و نقش‌ها برای ASP.NET Core</Description>
     <PackageTags>aspnetcore;membership;authentication;authorization;jwt;roles</PackageTags>
-    <PackageProjectUrl>https://github.com/yourusername/ZA_Membership</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/yourusername/ZA_Membership</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/aliram-ir/ZA_Membership</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/aliram-ir/ZA_Membership.git</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
