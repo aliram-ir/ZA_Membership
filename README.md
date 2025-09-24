@@ -13,157 +13,456 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
+Membership, Authentication, and Roles Management Library for ASP.NET Core
 
-کتابخانه مدیریت عضویت، احراز هویت و نقش‌ها برای ASP.NET Core
+## Features
 
-## ویژگی‌ها
+- User registration and login
+- JWT Token and Refresh Token management
+- Roles and permissions system
+- Ability to change password
+- Enable/disable users
+- Log out from all devices
+- Flexible configuration
 
-- ثبت نام و ورود کاربران
-- مدیریت JWT Token و Refresh Token
-- سیستم نقش‌ها و مجوزها
-- امکان تغییر رمز عبور
-- فعال/غیرفعال کردن کاربران
-- خروج از همه دستگاه‌ها
-- پیکربندی انعطاف‌پذیر
-
-## نصب
+# How to install
+Nuget:
+https://www.nuget.org/packages/ZA.Membership/
+### Terminal
 ```bash
-dotnet add package ZA.Membership
-
-## پیکربندی
-
-### 1. appsettings.json
-
-json
-{
-  "ZAMembership": {
-"Jwt": {
-"SecretKey": "your-super-secret-jwt-key-here-minimum-32-characters",
-"Issuer": "YourApp",
-"Audience": "YourApp",
-"AccessTokenExpiryMinutes": 60,
-"RefreshTokenExpiryDays": 30
-},
-"Password": {
-"MinimumLength": 8,
-"RequireUppercase": true,
-"RequireLowercase": true,
-"RequireDigit": true,
-"RequireSpecialCharacter": true
-},
-"User": {
-"RequireUniqueEmail": true,
-"RequireEmailConfirmation": false,
-"RequirePhoneNumberConfirmation": false
-},
-"Security": {
-"MaxFailedAccessAttempts": 5,
-"LockoutTimeSpanMinutes": 30,
-"RequireTwoFactor": false
-}
+> dotnet add package ZA.Membership
+```
+### Package Manager
+```bash
+PM> NuGet\Install-Package ZA.Membershi
+```
+## Files in the host project:
+### appSettings:
+```bash
+"ZAMembership": {
+  "Jwt": {
+    "SecretKey": "YourSuperSecretKeyForJWTTokensWhichMustBeAtLeast32Characters!",
+    "Issuer": "YourApp",
+    "Audience": "YourAppUsers",
+    "AccessTokenExpiryMinutes": 15,
+    "RefreshTokenExpiryDays": 7
+  },
+  "Password": {
+    "RequiredLength": 6,
+    "RequireDigit": true,
+    "RequireLowercase": true,
+    "RequireUppercase": true,
+    "RequireNonAlphanumeric": true
+  },
+  "User": {
+    "RequireUniqueEmail": true,
+    "RequireEmailConfirmation": false,
+    "RequirePhoneNumberConfirmation": false
   }
-}
-
-### 2. Program.cs
-
-csharp
+},
+```
+### Program.cs:
+```bash
 using ZA_Membership.Extensions;
-
-var builder = WebApplication.CreateBuilder(args);
-
-// Add ZA Membership
+.
+.
+.
 builder.Services.AddZAMembership(builder.Configuration);
-
-// یا با پیکربندی دستی
-builder.Services.AddZAMembershipWithOptions(options =>
-{
-options.Jwt.SecretKey = "your-secret-key";
-options.Jwt.Issuer = "YourApp";
-options.Jwt.Audience = "YourApp";
-// ...
-});
-
-// Add controllers
-builder.Services.AddControllers();
-
+.
+.
 var app = builder.Build();
+```
+### AppDbContext.cs:
+```bash
+using Microsoft.EntityFrameworkCore;
+using ZA_Membership.Models.Entities;
 
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
-
-### 3. پیاده‌سازی Repository ها
-
-شما باید interface های repository را در پروژه خود پیاده‌سازی کنید:
-
-csharp
-public class UserRepository : IUserRepository
+namespace TestApi
 {
-// پیاده‌سازی متدهای مربوط به User
+    public class AppDbContext : DbContext
+    {
+        public AppDbContext(DbContextOptions<AppDbContext> options)
+            : base(options)
+        {
+        }
+        public AppDbContext()
+        {
+        }
+
+        public DbSet<User> Users { get; set; }
+        public DbSet<Role> Role { get; set; }
+        public DbSet<UserRole> UserRole { get; set; }
+        public DbSet<UserToken> UserToken { get; set; }
+        public DbSet<RolePermission> RolePermission { get; set; }
+        public DbSet<Permission> Permission { get; set; }
+    }
 }
+```
+#### Migration
+```bash
+dotnet ef migrations add InitialCreate
+dotnet ef database update
+```
 
-public class UserTokenRepository : IUserTokenRepository
-{
-// پیاده‌سازی متدهای مربوط به UserToken
-}
+### AuthController:
+```bash
+using Microsoft.AspNetCore.Mvc;
+using ZA_Membership.Models.DTOs;
+using ZA_Membership.Services.Interfaces;
 
-public class RoleRepository : IRoleRepository
-{
-// پیاده‌سازی متدهای مربوط به Role
-}
-
-## استفاده
-
-### در Controller:
-
-csharp
 [ApiController]
 [Route("api/[controller]")]
-public class AccountController : ControllerBase
+public class AuthController : ControllerBase
 {
-private readonly IMembershipService _membershipService;
+    private readonly IMembershipService _membershipService;
 
-public AccountController(IMembershipService membershipService)
-{
-_membershipService = membershipService;
+    public AuthController(IMembershipService membershipService)
+    {
+        _membershipService = membershipService;
+    }
+
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterDto model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
+        {
+            var result = await _membershipService.RegisterAsync(model);
+
+            if (result.IsSuccess)
+            {
+                return Ok(new
+                {
+                    message = result.Message,
+                    user = result.User,
+                    accessToken = result.AccessToken,
+                    refreshToken = result.RefreshToken,
+                    expiresAt = result.ExpiresAt
+                });
+            }
+
+            return BadRequest(new
+            {
+                message = result.Message,
+                errors = result.Errors
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = ex.Message });
+        }
+    }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginDto model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
+        {
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+            var userAgent = Request.Headers["User-Agent"].ToString();
+
+            var result = await _membershipService.LoginAsync(model, ipAddress, userAgent);
+
+            if (result.IsSuccess)
+            {
+                return Ok(new
+                {
+                    message = result.Message,
+                    user = result.User,
+                    accessToken = result.AccessToken,
+                    refreshToken = result.RefreshToken,
+                    expiresAt = result.ExpiresAt
+                });
+            }
+
+            return Unauthorized(new
+            {
+                message = result.Message,
+                errors = result.Errors
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = ex.Message });
+        }
+    }
+
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout([FromBody] LogoutDto model)
+    {
+        try
+        {
+            var result = await _membershipService.LogoutAsync(model.RefreshToken);
+
+            if (result.IsSuccess)
+            {
+                return Ok(new { message = result.Message });
+            }
+
+            return BadRequest(new { message = result.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = ex.Message });
+        }
+    }
+
+    [HttpPost("refresh-token")]
+    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenDto model)
+    {
+        try
+        {
+            var result = await _membershipService.RefreshTokenAsync(model.RefreshToken);
+
+            if (result.IsSuccess)
+            {
+                return Ok(new
+                {
+                    message = result.Message,
+                    user = result.User,
+                    accessToken = result.AccessToken,
+                    refreshToken = result.RefreshToken,
+                    expiresAt = result.ExpiresAt
+                });
+            }
+
+            return BadRequest(new
+            {
+                message = result.Message,
+                errors = result.Errors
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = ex.Message });
+        }
+    }
 }
+```
+### ProfileController:
 
-[HttpPost("register")]
-public async Task<IActionResult> Register(RegisterDto model)
-{
-var result = await _membershipService.RegisterAsync(model);
-return result.IsSuccess ? Ok(result) : BadRequest(result);
-}
+```bash
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using ZA_Membership.Models.DTOs;
+using ZA_Membership.Security;
+using ZA_Membership.Services.Interfaces;
 
-[HttpPost("login")]
-public async Task<IActionResult> Login(LoginDto model)
-{
-var result = await _membershipService.LoginAsync(model);
-return result.IsSuccess ? Ok(result) : BadRequest(result);
-}
-
-[HttpPost("logout")]
+[ApiController]
+[Route("api/[controller]")]
 [Authorize]
-public async Task<IActionResult> Logout()
+public class ProfileController : ControllerBase
 {
-var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-var result = await _membershipService.LogoutAsync(token);
-return result.IsSuccess ? Ok(result) : BadRequest(result);
-}
+    private readonly IMembershipService _membershipService;
+    private readonly ICurrentUserService _currentUserService;
+
+    public ProfileController(
+        IMembershipService membershipService,
+        ICurrentUserService currentUserService)
+    {
+        _membershipService = membershipService;
+        _currentUserService = currentUserService;
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetProfile()
+    {
+        try
+        {
+            var userId = _currentUserService.UserId;
+
+            if (userId == null)
+                return Unauthorized();
+
+            var result = await _membershipService.GetUserAsync(userId.Value);
+
+            if (result.IsSuccess)
+            {
+                return Ok(new
+                {
+                    user = result.Data
+                });
+            }
+
+            return NotFound(new { message = result.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = ex.Message });
+        }
+    }
+
+    [HttpPut]
+    public async Task<IActionResult> UpdateProfile([FromBody] UpdateUserDto model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
+        {
+            var userId = _currentUserService.UserId;
+
+            if (userId == null)
+                return Unauthorized();
+
+            var result = await _membershipService.UpdateUserAsync(userId.Value, model);
+
+            if (result.IsSuccess)
+            {
+                return Ok(new
+                {
+                    message = result.Message,
+                    user = result.Data
+                });
+            }
+
+            return BadRequest(new
+            {
+                message = result.Message
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = ex.Message });
+        }
+    }
+
+    [HttpPost("change-password")]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
+        {
+            var userId = _currentUserService.UserId;
+
+            if (userId == null)
+                return Unauthorized();
+
+            var result = await _membershipService.ChangePasswordAsync(userId.Value, model);
+
+            if (result.IsSuccess)
+            {
+                return Ok(new { message = result.Message });
+            }
+
+            return BadRequest(new { message = result.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = ex.Message });
+        }
+    }
+
+    [HttpPost("logout-all")]
+    public async Task<IActionResult> LogoutAllDevices()
+    {
+        try
+        {
+            var userId = _currentUserService.UserId;
+
+            if (userId == null)
+                return Unauthorized();
+
+            var result = await _membershipService.LogoutAllDevicesAsync(userId.Value);
+
+            if (result.IsSuccess)
+            {
+                return Ok(new { message = result.Message });
+            }
+
+            return BadRequest(new { message = result.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = ex.Message });
+        }
+    }
 }
 
-### استفاده از Attribute ها:
+```
+##
+Packages:
+```bash
+<ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.9">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.0-rc.1.25451.107">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="9.0.4" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="9.0.4" />
+<PackageReference Include="ZA.Membership" Version="1.0.0" />
 
-csharp
-[RequirePermission("UserManagement")]
-public async Task<IActionResult> GetUsers()
+```
+# Api Tests:
+## Register:
+```bash
+POST: /api/auth/register
+Content-Type: application/json
+
 {
-// کد شما
+    "firstName": "Ali",
+    "lastName": "Ramezani",
+    "email": "ali@example.com",
+    "phoneNumber": "09123456789",
+    "password": "Test123!",
+    "confirmPassword": "Test123!"
 }
+```
+## Login:
+```bash
+POST: /api/auth/login
+Content-Type: application/json
 
-## مجوز
+{
+    "email": "ali@example.com",
+    "password": "Test123!"
+}
+```
+## Get Profile:
+GET: /api/profile
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+```bash
+PUT: /api/profile
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+Content-Type: application/json
 
-MIT License
+{
+    "firstName": Ali",
+    "lastName": "Ramezani",
+    "phoneNumber": "09987654321"
+}
+```
+## Change Password:
+```bash
+POST: /api/profile/change-password
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+Content-Type: application/json
+
+{
+    "currentPassword": "Test123!",
+    "newPassword": "NewTest123!",
+    "confirmNewPassword": "NewTest123!"
+}
+```
+
+

@@ -13,7 +13,7 @@
     <releaseNotes>Initial release with core membership functionality including user management, role-based access control, and clean architecture support.</releaseNotes>
     <copyright>Copyright (c) 2025 ZA Solutions</copyright>
     <tags>aspnetcore membership authentication authorization jwt roles</tags>
-    <repository type="git" url="https://github.com/aliram-ir/ZA_Membership.git" commit="828679ee58b7133db3eec790bc5393dae7f861a5" />
+    <repository type="git" url="https://github.com/aliram-ir/ZA_Membership.git" commit="b7357b802bb56b39116bc2eaec9b6731ed7274ba" />
     <dependencies>
       <group targetFramework="net9.0">
         <dependency id="BCrypt.Net-Next" version="4.0.3" exclude="Build,Analyzers" />
