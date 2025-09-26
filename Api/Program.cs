@@ -1,9 +1,13 @@
+using Api.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.OpenApi.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.Text;
 using ZA_Membership.Extensions;
+using ZA_Membership.Services.Implementations;
+using ZA_Membership.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +15,17 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container
 // ============================
 
+// ثبت DbContext
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 builder.Services.AddControllers();
+
+// ثبت ریپازیتوری‌ها
+//builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IMembershipService, MembershipService>();
+//builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+//builder.Services.AddScoped<IUserTokenRepository, UserTokenRepository>();
 
 // تنظیمات Membership (مثال)
 builder.Services.AddZAMembership(builder.Configuration, "ZAMembership");
@@ -35,6 +49,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]!))
         };
     });
+
+
+
+
 
 // --- CORS ---
 builder.Services.AddCors(options =>
