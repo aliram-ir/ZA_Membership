@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>ZA.Membership</id>
+    <version>1.0.3</version>
+    <authors>َAli Ramezani</authors>
+    <description>A comprehensive membership management library</description>
+    <language>en-US</language>
+    <projectUrl>https://github.com/aliram-ir/ZA_Membership</projectUrl>
+    <iconUrl>https://github.com/aliram-ir/ZA_Membership/raw/main/icon.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <releaseNotes>Initial release</releaseNotes>
+    <copyright>Copyright 2025</copyright>
+    <tags>membership authentication authorization</tags>
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Microsoft.Extensions.DependencyInjection.Abstractions" version="8.0.0" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin\Release\net9.0\ZA.Membership.dll" target="lib\net9.0" />
+    <file src="bin\Release\net9.0\ZA.Membership.xml" target="lib\net9.0" />
+  </files>
+</package>
