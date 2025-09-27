@@ -173,7 +173,6 @@ namespace ZA_Membership.Services.Implementations
                     };
                 }
 
-                user.LastLoginAt = DateTime.UtcNow;
                 await _userRepository.UpdateAsync(user);
 
                 var roles = await _userRepository.GetUserRolesAsync(user.Id);
@@ -264,7 +263,6 @@ namespace ZA_Membership.Services.Implementations
                 EmailConfirmed = user.EmailConfirmed,
                 PhoneNumberConfirmed = user.PhoneNumberConfirmed,
                 CreatedAt = user.CreatedAt,
-                LastLoginAt = user.LastLoginAt,
                 Roles = roles,
                 Permissions = permissions
             };

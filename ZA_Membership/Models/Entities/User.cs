@@ -55,11 +55,15 @@ namespace ZA_Membership.Models.Entities
         /// The phone number of the user.
         /// </summary>
         public string? PhoneNumber { get; set; }
+        public string? ProfilePictureUrl { get; set; }
+        public DateTime? Birthday { get; set; }
 
         /// <summary>
         /// Indicates whether the user account is active.
         /// </summary>
         public bool IsActive { get; set; } = true;
+        public bool IsVerify { get; set; } = false;
+        public bool IsDelete { get; set; } = false;
 
         //TODO: Add IsLocked Field And Implement Lockout Mechanism
         //TODO: Add AccessFailedCount Field
@@ -67,10 +71,7 @@ namespace ZA_Membership.Models.Entities
         //TODO: Add TwoFactorEnabled Field
         //TODO: Add SecurityStamp Field
         //TODO: Add ConcurrencyStamp Field
-        //TODO: Add ProfilePictureUrl Field
-        //TODO: Add DateOfBirth Field
         //TODO: Add Address Field
-        //TODO: Add IsDelete Field For Soft Delete
 
         /// <summary>
         /// Indicates whether the user's email has been confirmed.
@@ -96,8 +97,6 @@ namespace ZA_Membership.Models.Entities
         /// The date and time when the user last logged in.
         /// </summary>
         
-        //TODO: Delete This Field And Create UserActivity Table
-        public DateTime? LastLoginAt { get; set; }
 
         // Navigation Properties
         /// <summary>
@@ -109,5 +108,8 @@ namespace ZA_Membership.Models.Entities
         /// The refresh tokens associated with the user.
         /// </summary>
         public virtual ICollection<UserToken> UserTokens { get; set; } = [];
+        public virtual ICollection<Address> Addresses { get; set; } = [];
+        public virtual ICollection<UserActivity> UserActivity { get; set; } = [];
+        public virtual ICollection<AuthBlockList> AuthBlockList { get; set; } = [];
     }
 }

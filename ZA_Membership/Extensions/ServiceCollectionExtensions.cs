@@ -1,51 +1,58 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using ZA_Membership.Configuration;
+using ZA_Membership.Data;
 using ZA_Membership.Security;
 using ZA_Membership.Services.Implementations;
 using ZA_Membership.Services.Interfaces;
 
 namespace ZA_Membership.Extensions
 {
-    /// <summary>
-    /// Extension methods for IServiceCollection to add ZA_Membership services and configuration.
-    /// </summary>
     public static class ServiceCollectionExtensions
     {
         /// <summary>
-        /// Adds ZA_Membership services and configures JWT authentication.
+        /// ثبت سرویس‌های ZA_Membership همراه با DbContext، ریپازیتوری‌ها و اجرای خودکار مایگریشن‌ها
         /// </summary>
-        /// <param name="services"></param>
-        /// <param name="configuration"></param>
-        /// <param name="configSectionName"></param>
-        /// <returns></returns>
         public static IServiceCollection AddZAMembership(
             this IServiceCollection services,
             IConfiguration configuration,
             string configSectionName = "ZAMembership")
         {
-            // Bind configuration
+            // Bind configuration to MembershipOptions
             var membershipOptions = new MembershipOptions();
             configuration.GetSection(configSectionName).Bind(membershipOptions);
             services.AddSingleton(membershipOptions);
 
-            // Register services
+            // Register DbContext for ZA_Membership
+            services.AddDbContext<MembershipDbContext>(options =>
+                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
+                    sqlOptions => sqlOptions.MigrationsAssembly(typeof(MembershipDbContext).Assembly.FullName)
+                )
+            );
+
+            // Register repositories
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IRoleRepository, RoleRepository>();
+            services.AddScoped<IUserTokenRepository, UserTokenRepository>();
+
+            // Register core services
             services.AddScoped<IMembershipService, MembershipService>();
             services.AddScoped<IJwtTokenService, JwtTokenService>();
             services.AddScoped<IPasswordService, PasswordService>();
 
-            // Configure JWT Authentication
+            // Configure JWT authentication
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-            .AddJwtBearer(options =>
+            .AddJwtBearer(optionsJwt =>
             {
-                options.TokenValidationParameters = new TokenValidationParameters
+                optionsJwt.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(membershipOptions.Jwt.SecretKey)),
@@ -60,50 +67,12 @@ namespace ZA_Membership.Extensions
 
             services.AddAuthorization();
 
-            return services;
-        }
-
-        /// <summary>
-        /// Adds ZA_Membership services with custom configuration and sets up JWT authentication.
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="configureOptions"></param>
-        /// <returns></returns>
-        public static IServiceCollection AddZAMembershipWithOptions(
-            this IServiceCollection services,
-            Action<MembershipOptions> configureOptions)
-        {
-            var options = new MembershipOptions();
-            configureOptions(options);
-            services.AddSingleton(options);
-
-            // Register services
-            services.AddScoped<IMembershipService, MembershipService>();
-            services.AddScoped<IJwtTokenService, JwtTokenService>();
-            services.AddScoped<IPasswordService, PasswordService>();
-
-            // Configure JWT Authentication
-            services.AddAuthentication(options =>
+            // Run migrations automatically at startup
+            using (var scope = services.BuildServiceProvider().CreateScope())
             {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(jwtOptions =>
-            {
-                jwtOptions.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(options.Jwt.SecretKey)),
-                    ValidateIssuer = true,
-                    ValidIssuer = options.Jwt.Issuer,
-                    ValidateAudience = true,
-                    ValidAudience = options.Jwt.Audience,
-                    ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero
-                };
-            });
-
-            services.AddAuthorization();
+                var db = scope.ServiceProvider.GetRequiredService<MembershipDbContext>();
+                db.Database.Migrate();
+            }
 
             return services;
         }
