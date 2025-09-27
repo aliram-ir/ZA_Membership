@@ -361,3 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/ZA_Membership/.nuspec
+/ZA_Membership/nupkg/ZA.Membership.1.0.3.nupkg
