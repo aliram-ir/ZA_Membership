@@ -47,5 +47,8 @@ namespace ZA_Membership.Models.DTOs
         /// The user's phone number (optional).
         /// </summary>
         public string? PhoneNumber { get; set; }
+        public string? ProfilePictureUrl { get; set; }
+
+        public DateTime? Birthday { get; set; }
     }
 }

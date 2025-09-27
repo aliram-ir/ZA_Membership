@@ -92,5 +92,46 @@ namespace ZA_Membership.Services.Implementations
         {
             return await _context.Users.AnyAsync(u => u.Id == id);
         }
+
+        public async Task SoftDeleteAsync(int id)
+        {
+            var entity = await _context.Users.FindAsync(id);
+            if (entity != null)
+            {
+                entity.IsDelete = true;
+                entity.UpdatedAt = DateTime.UtcNow;
+                _context.Users.Update(entity);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<List<Address>> GetUserAddressesAsync(int userId)
+        {
+            // همه آدرس‌های کاربر
+            return await _context.Addresses
+                .Where(a => a.UserId == userId)
+                .ToListAsync();
+        }
+
+        public async Task<Address?> GetUserDefaultAddressAsync(int userId)
+        {
+            // گرفتن آدرس پیش‌فرض
+            return await _context.Addresses
+                .FirstOrDefaultAsync(a => a.UserId == userId && a.IsDefault);
+        }
+
+        public async Task<List<UserActivity>> GetUserActivitiesAsync(int userId)
+        {
+            return await _context.UserActivities
+                .Where(ua => ua.UserId == userId)
+                .ToListAsync();
+        }
+
+        public async Task<List<AuthBlockList>> GetUserBlockListAsync(int userId)
+        {
+            return await _context.AuthBlockLists
+                .Where(ab => ab.UserId == userId)
+                .ToListAsync();
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ZA_Membership.Data.Configurations;
 using ZA_Membership.Models.Entities;
 
 namespace ZA_Membership.Data
@@ -10,56 +11,31 @@ namespace ZA_Membership.Data
         }
 
         public DbSet<User> Users { get; set; }
-        public DbSet<Address> Address { get; set; }
-        public DbSet<UserActivity> UserActivity { get; set; }
+        public DbSet<Address> Addresses { get; set; }
+        public DbSet<UserActivity> UserActivities { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
         public DbSet<RolePermission> RolePermissions { get; set; }
         public DbSet<UserToken> UserTokens { get; set; }
-        public DbSet<AuthBlockList> AuthBlockList { get; set; }
-        public DbSet<AuthFailedAttempt> AuthFailedAttempt { get; set; }
+        public DbSet<AuthBlockList> AuthBlockLists { get; set; }
+        public DbSet<AuthFailedAttempt> AuthFailedAttempts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(builder);
-
-            // 🔹 User config
-            builder.Entity<User>()
-                .HasIndex(u => u.Username)
-                .IsUnique();
-
-            builder.Entity<User>()
-                .HasIndex(u => u.Email)
-                .IsUnique();
-
-            // 🔹 UserRole config
-            builder.Entity<UserRole>()
-                .HasKey(ur => new { ur.UserId, ur.RoleId });
-
-            builder.Entity<UserRole>()
-                .HasOne(ur => ur.User)
-                .WithMany(u => u.UserRoles)
-                .HasForeignKey(ur => ur.UserId);
-
-            builder.Entity<UserRole>()
-                .HasOne(ur => ur.Role)
-                .WithMany(r => r.UserRoles)
-                .HasForeignKey(ur => ur.RoleId);
-
-            // 🔹 RolePermission config
-            builder.Entity<RolePermission>()
-                .HasKey(rp => new { rp.RoleId, rp.PermissionId });
-
-            builder.Entity<RolePermission>()
-                .HasOne(rp => rp.Role)
-                .WithMany(r => r.RolePermissions)
-                .HasForeignKey(rp => rp.RoleId);
-
-            builder.Entity<RolePermission>()
-                .HasOne(rp => rp.Permission)
-                .WithMany()
-                .HasForeignKey(rp => rp.PermissionId);
+            builder.ApplyConfigurationsFromAssembly(typeof(MembershipDbContext).Assembly);
+            #region Manual Configs
+            //builder.ApplyConfiguration(new UserConfiguration());
+            //builder.ApplyConfiguration(new RoleConfiguration());
+            //builder.ApplyConfiguration(new UserRoleConfiguration());
+            //builder.ApplyConfiguration(new UserTokenConfiguration());
+            //builder.ApplyConfiguration(new AddressConfiguration());
+            //builder.ApplyConfiguration(new AuthBlockListConfiguration());
+            //builder.ApplyConfiguration(new AuthFailedAttemptConfiguration());
+            //builder.ApplyConfiguration(new PermissionConfiguration());
+            //builder.ApplyConfiguration(new RolePermissionConfiguration());
+            //builder.ApplyConfiguration(new UserActivityConfiguration());
+            #endregion
         }
     }
 }

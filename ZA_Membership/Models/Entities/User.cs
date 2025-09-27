@@ -109,7 +109,7 @@ namespace ZA_Membership.Models.Entities
         /// </summary>
         public virtual ICollection<UserToken> UserTokens { get; set; } = [];
         public virtual ICollection<Address> Addresses { get; set; } = [];
-        public virtual ICollection<UserActivity> UserActivity { get; set; } = [];
+        public virtual ICollection<UserActivity> UserActivities { get; set; } = [];
         public virtual ICollection<AuthBlockList> AuthBlockList { get; set; } = [];
     }
 }

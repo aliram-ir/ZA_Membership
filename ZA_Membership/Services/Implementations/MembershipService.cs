@@ -1,4 +1,4 @@
-using ZA_Membership.Configuration;
+﻿using ZA_Membership.Configuration;
 using ZA_Membership.Models.DTOs;
 using ZA_Membership.Models.Entities;
 using ZA_Membership.Models.Results;
@@ -21,6 +21,7 @@ namespace ZA_Membership.Services.Implementations
         private readonly IJwtTokenService _jwtTokenService;
         private readonly IPasswordService _passwordService;
         private readonly MembershipOptions _options;
+        private readonly IAddressRepository _addressRepository;
         private readonly ResourceManager _rm = new ResourceManager(typeof(Messages));
 
         /// <summary>
@@ -38,7 +39,7 @@ namespace ZA_Membership.Services.Implementations
             IRoleRepository roleRepository,
             IJwtTokenService jwtTokenService,
             IPasswordService passwordService,
-            MembershipOptions options)
+            MembershipOptions options, IAddressRepository addressRepository)
         {
             _userRepository = userRepository;
             _tokenRepository = tokenRepository;
@@ -46,6 +47,7 @@ namespace ZA_Membership.Services.Implementations
             _jwtTokenService = jwtTokenService;
             _passwordService = passwordService;
             _options = options;
+            _addressRepository = addressRepository;
         }
 
 
@@ -93,14 +95,14 @@ namespace ZA_Membership.Services.Implementations
                 {
                     Username = registerDto.Username,
                     Email = registerDto.Email ?? string.Empty,
+                    NationalCode = registerDto.NationalCode ?? string.Empty,
                     PasswordHash = _passwordService.HashPassword(registerDto.Password),
                     FirstName = registerDto.FirstName,
                     LastName = registerDto.LastName,
-                    PhoneNumber = registerDto.PhoneNumber,
-                    CreatedAt = DateTime.UtcNow,
-                    IsActive = true,
-                    EmailConfirmed = !_options.User.RequireEmailConfirmation,
-                    PhoneNumberConfirmed = !_options.User.RequirePhoneNumberConfirmation
+                    Birthday = registerDto.Birthday ?? null,
+                    ProfilePictureUrl = registerDto.ProfilePictureUrl ?? string.Empty,
+                    IsVerify = false,
+                    IsActive = true
                 };
 
                 var createdUser = await _userRepository.CreateAsync(user);
@@ -487,6 +489,12 @@ namespace ZA_Membership.Services.Implementations
                 return ServiceResult.Failure(_rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred");
             }
         }
+
+        public async Task SoftDeleteUserAsync(int userId)
+        {
+            await _userRepository.SoftDeleteAsync(userId);
+        }
+
         /// <inheritdoc/>
         public async Task<ServiceResult> AssignRoleAsync(int userId, string roleName)
         {
@@ -616,6 +624,18 @@ namespace ZA_Membership.Services.Implementations
             {
                 return ServiceResult<bool>.Failure(_rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred");
             }
+        }
+
+        public async Task<Address> AddUserAddressAsync(int userId, Address address)
+        {
+            address.UserId = userId;
+            return await _addressRepository.CreateAsync(address);
+        }
+
+        // گرفتن همه آدرس‌های یک کاربر
+        public async Task<List<Address>> GetUserAddressesAsync(int userId)
+        {
+            return await _addressRepository.GetByUserIdAsync(userId);
         }
     }
 }

@@ -1,0 +1,154 @@
+﻿چندین کلاس تنظیمات (Options) داری که هدفشان اینه که مقادیر پیکربندی رو از appsettings.json یا محیط اجرا دریافت کنند و از طریق Dependency Injection (IOptions<T>) در سرویس‌ها قابل استفاده باشند.
+
+1. JwtOptions.cs
+تنظیمات مربوط به JWT Authentication:
+
+SecretKey → کلید امضای توکن JWT
+Issuer → صادرکننده توکن
+Audience → مصرف‌کننده توکن
+AccessTokenExpiryMinutes → زمان انقضای Access Token
+RefreshTokenExpiryDays → زمان انقضای Refresh Token
+
+2. MembershipOptions.cs
+معمولاً شامل تنظیـمات عمومی ماژول عضویت:
+
+تعداد تلاش‌های مجاز ورود
+سیاست‌های ثبت‌نام
+فعال بودن/نبودن بعضی قابلیت‌ها
+
+3. PasswordOptions.cs
+سیاست‌های مربوط به رمز عبور:
+
+حداقل طول رمز عبور
+نیاز به عدد، حرف بزرگ، کاراکتر ویژه و …
+
+4. SecurityOptions.cs
+تنظیمات امنیتی کلی:
+
+قابلیت فعال‌سازی حالت Secure Mode
+محدودیت‌های IP یا آنلاک کردن حساب‌ها
+
+5. UserOptions.cs
+تنظیمات مربوط به کاربر:
+
+طول مجاز نام کاربری
+الگوهای ایمیل یا شماره موبایل
+فعال بودن پروفایل پیش‌فرض
+
+این کلاس‌ها طوری طراحی می‌شن که در appsettings.json یک بخش با همان نام کلاس (یا Section خاص) داشته باشیم.
+
+services.Configure<JwtOptions>(configuration.GetSection("JwtOptions"));
+
+
+public MyService(IOptions<JwtOptions> jwtOptions)
+{
+    var secret = jwtOptions.Value.SecretKey;
+}
+
+این کلاس‌های داخل Configuration مثل یک پل بین appsettings.json و کد عمل می‌کنن تا تمام مقادیر تنظیمات رو به صورت strongly‑typed بگیری و دیگه مجبور نباشی با key‑value خام کار کنی.
+
+حالا که مفهومش رو فهمیدی، مرحله بعد می‌تونه این باشه که اون‌ها رو توی Program.cs به صورت DI ثبت کنیم و از طریق IOptions<T> یا حتی IOptionsSnapshot<T> داخل سرویس‌ها استفاده کنیم.
+
+
+
+{
+  "MembershipOptions": {
+    "Jwt": {
+      "SecretKey": "SuperSecureKey1234567890!",
+      "Issuer": "MyApp",
+      "Audience": "MyAppUsers",
+      "AccessTokenExpiryMinutes": 60,
+      "RefreshTokenExpiryDays": 30
+    },
+    "Password": {
+      "MinimumLength": 8,
+      "RequireUppercase": true,
+      "RequireLowercase": true,
+      "RequireDigit": true,
+      "RequireSpecialCharacter": true
+    },
+    "User": {
+      "MaxUsernameLength": 20,
+      "MinUsernameLength": 3
+    },
+    "Security": {
+      "MaxFailedAccessAttempts": 5,
+      "LockoutTimeSpanMinutes": 30,
+      "RequireTwoFactor": false
+    }
+  }
+}
+
+-----------------------------------
+ثبت پیکربندی در Program.cs
+
+using ZA_Membership.Configuration;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// ثبت MembershipOptions به صورت کلی
+builder.Services.Configure<MembershipOptions>(
+    builder.Configuration.GetSection("MembershipOptions"));
+
+// اگر بخواهیم هر بخش رو جداگانه هم ثبت کنیم
+builder.Services.Configure<JwtOptions>(
+    builder.Configuration.GetSection("MembershipOptions:Jwt"));
+builder.Services.Configure<PasswordOptions>(
+    builder.Configuration.GetSection("MembershipOptions:Password"));
+builder.Services.Configure<SecurityOptions>(
+    builder.Configuration.GetSection("MembershipOptions:Security"));
+
+// ادامه تنظیمات DI، اضافه کردن DbContext، سرویس‌ها و...
+
+
+-------------------
+استفاده در یک سرویس با IOptions<T>
+فرض کنید در MembershipService می‌خواهیم به مقدار زمان انقضای Access Token دسترسی داشته باشیم:
+
+using Microsoft.Extensions.Options;
+using ZA_Membership.Configuration;
+
+public class MembershipService : IMembershipService
+{
+    private readonly JwtOptions _jwtOptions;
+    private readonly PasswordOptions _passwordOptions;
+
+    public MembershipService(
+        IOptions<JwtOptions> jwtOptions,
+        IOptions<PasswordOptions> passwordOptions)
+    {
+        _jwtOptions = jwtOptions.Value;
+        _passwordOptions = passwordOptions.Value;
+    }
+
+    public void PrintSettings()
+    {
+        Console.WriteLine($"Access Token Expiry: {_jwtOptions.AccessTokenExpiryMinutes} minutes");
+        Console.WriteLine($"Password Min Length: {_passwordOptions.MinimumLength}");
+    }
+}
+
+
+-------------------------
+استفاده با IOptionsSnapshot<T> (برای تغییرات runtime)
+اگر بخواهیم بدون restart برنامه وقتی config تغییر کرد آن را بگیریم:
+
+public class TokenService
+{
+    private readonly IOptionsSnapshot<JwtOptions> _jwtOptions;
+
+    public TokenService(IOptionsSnapshot<JwtOptions> jwtOptions)
+    {
+        _jwtOptions = jwtOptions;
+    }
+
+    public string GetIssuer()
+    {
+        return _jwtOptions.Value.Issuer;
+    }
+}
+-------------------------------
+مزیت این روش:
+کد strongly‑typed و بدون string magic
+قابلیت تغییر config در فایل JSON بدون تغییر کد
+جدا کردن کامل concerns از کد برنامه (OPTIONS pattern)

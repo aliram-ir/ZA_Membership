@@ -56,6 +56,8 @@ namespace ZA_Membership.Services.Interfaces
         /// <returns></returns>
         Task DeleteAsync(int id);
 
+        Task SoftDeleteAsync(int id); // تغییر IsDelete به true
+
         /// <summary>
         /// بررسی وجود کاربر بر اساس شناسه
         /// </summary>
@@ -90,5 +92,35 @@ namespace ZA_Membership.Services.Interfaces
         /// <param name="userId"></param>
         /// <returns></returns>
         Task<List<string>> GetUserPermissionsAsync(int userId);
+
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        Task<List<Address>> GetUserAddressesAsync(int userId);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        Task<Address?> GetUserDefaultAddressAsync(int userId);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        Task<List<UserActivity>> GetUserActivitiesAsync(int userId);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        Task<List<AuthBlockList>> GetUserBlockListAsync(int userId);
     }
 }

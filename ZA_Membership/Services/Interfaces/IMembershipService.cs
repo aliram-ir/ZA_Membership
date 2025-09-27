@@ -1,4 +1,5 @@
 using ZA_Membership.Models.DTOs;
+using ZA_Membership.Models.Entities;
 using ZA_Membership.Models.Results;
 
 namespace ZA_Membership.Services.Interfaces
@@ -144,5 +145,10 @@ namespace ZA_Membership.Services.Interfaces
         /// <param name="roleName"></param>
         /// <returns></returns>
         Task<ServiceResult<bool>> IsInRoleAsync(int userId, string roleName);
+
+        Task<Address> AddUserAddressAsync(int userId, Address address);
+        Task<List<Address>> GetUserAddressesAsync(int userId);
+
+
     }
 }

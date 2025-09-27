@@ -13,18 +13,18 @@ namespace ZA_Membership.Models.Entities
         public string PostalCode { get; set; } = string.Empty; // "123
         public string Street { get; set; } = string.Empty; // "خیابان انقلاب",
         public string Street2 { get; set; } = string.Empty; // "خیابان آزادی",
-        public string District { get; private set; } = string.Empty; // "منطقه 12",
+        public string District { get; set; } = string.Empty; // "منطقه 12",
         public string SideFloor { get; set; } = string.Empty; // "4",
         public string Description { get; set; } = string.Empty; // "آپارتمان 4، طبقه 2، پلاک 1234",
         public string BuildingName { get; set; } = string.Empty; // "ساختمان آزادی",
 
-        public bool IsDefault { get; private set; } // آدرس پیش‌فرض است؟
+        public bool IsDefault { get; set; } // آدرس پیش‌فرض است؟
 
         // --- کلید خارجی و Navigation Property ---
-        public int UserId { get; private set; }
+        public int UserId { get; set; }
 
         [ForeignKey(nameof(UserId))]
-        public virtual User? User { get; private set; }
+        public virtual User? User { get; set; }
 
     }
 }
