@@ -17,11 +17,12 @@
     </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4" />
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="9.0.4" />
+    <PackageReference Include="ZA.Membership" Version="1.0.3" />
   </ItemGroup>
 
-  <ItemGroup>
+  <!--<ItemGroup>
     <ProjectReference Include="..\ZA_Membership\ZA_Membership.csproj" />
-  </ItemGroup>
+  </ItemGroup>-->
 
   <PropertyGroup>
   <GenerateDocumentationFile>true</GenerateDocumentationFile>

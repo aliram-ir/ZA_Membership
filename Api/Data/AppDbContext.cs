@@ -22,12 +22,6 @@ namespace Api.Data
             //}
         }
 
-        public DbSet<User> Users { get; set; }
-        public DbSet<Role> Role { get; set; }
-        public DbSet<UserRole> UserRole { get; set; }
-        public DbSet<UserToken> UserToken { get; set; }
-        public DbSet<RolePermission> RolePermission { get; set; }
-        public DbSet<Permission> Permission { get; set; }
     }
 }
 
