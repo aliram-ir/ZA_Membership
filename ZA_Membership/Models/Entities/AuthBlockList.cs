@@ -40,6 +40,7 @@ namespace ZA_Membership.Models.Entities
         /// The UTC date and time when the block automatically expires.
         /// If null, the block is permanent until manually removed.
         /// </summary>
+        public DateTime? BlockDate { get; private set; }
         public DateTime? BlockExpiresAt { get; private set; }
     }
 }

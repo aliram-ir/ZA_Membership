@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ZA_Membership.Data;
 using ZA_Membership.Models.Entities;
-using ZA_Membership.Services.Interfaces;
+using ZA_Membership.Repositories.Interfaces;
 
-namespace ZA_Membership.Services.Implementations
+namespace ZA_Membership.Repositories.Implementations
 {
-    public class UserRepository : IUserRepository
+    internal class UserRepository : IUserRepository
     {
         private readonly MembershipDbContext _context;
 

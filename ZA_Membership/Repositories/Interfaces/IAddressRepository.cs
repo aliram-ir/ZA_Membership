@@ -1,12 +1,12 @@
 ﻿using ZA_Membership.Models.Entities;
 
-namespace ZA_Membership.Services.Interfaces
+namespace ZA_Membership.Repositories.Interfaces
 {
     /// <summary>
     /// رابط ریپازیتوری برای مدیریت آدرس‌های کاربران.
     /// Repository interface for managing user addresses.
     /// </summary>
-    public interface IAddressRepository
+    internal interface IAddressRepository
     {
         /// <summary>
         /// دریافت آدرس با شناسه یکتا

@@ -6,6 +6,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using ZA_Membership.Configuration;
 using ZA_Membership.Data;
+using ZA_Membership.Repositories.Implementations;
+using ZA_Membership.Repositories.Interfaces;
 using ZA_Membership.Security;
 using ZA_Membership.Services.Implementations;
 using ZA_Membership.Services.Interfaces;
@@ -39,9 +41,20 @@ namespace ZA_Membership.Extensions
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IUserTokenRepository, UserTokenRepository>();
             services.AddScoped<IAddressRepository, AddressRepository>();
+            services.AddScoped<IPermissionRepository, PermissionRepository>();
+            services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
+            services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+            services.AddScoped<IUserActivityRepository, UserActivityRepository>();
+            services.AddScoped<IAuthBlockListRepository, AuthBlockListRepository>();
+
 
             // Register core services
             services.AddScoped<IMembershipService, MembershipService>();
+            services.AddScoped<IRoleService, RoleService>();
+            services.AddScoped<IPermissionService, PermissionService>();
+            services.AddScoped<IUserActivityService, UserActivityService>();
+            services.AddScoped<IAuthBlockListService, AuthBlockListService>();
+
             services.AddScoped<IJwtTokenService, JwtTokenService>();
             services.AddScoped<IPasswordService, PasswordService>();
 

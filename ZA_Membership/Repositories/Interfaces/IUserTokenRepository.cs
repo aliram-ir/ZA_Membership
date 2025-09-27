@@ -1,11 +1,11 @@
 using ZA_Membership.Models.Entities;
 
-namespace ZA_Membership.Services.Interfaces
+namespace ZA_Membership.Repositories.Interfaces
 {
     /// <summary>
     /// Repository interface for managing UserToken entities.
     /// </summary>
-    public interface IUserTokenRepository
+    internal interface IUserTokenRepository
     {
         /// <summary>
         /// دریافت توکن کاربر بر اساس شناسه

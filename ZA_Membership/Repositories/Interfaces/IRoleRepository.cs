@@ -1,11 +1,11 @@
 using ZA_Membership.Models.Entities;
 
-namespace ZA_Membership.Services.Interfaces
+namespace ZA_Membership.Repositories.Interfaces
 {
     /// <summary>
     /// Repository interface for managing Role entities.
     /// </summary>
-    public interface IRoleRepository
+    internal interface IRoleRepository
     {
         /// <summary>
         /// دریافت نقش بر اساس شناسه

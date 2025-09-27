@@ -1,96 +1,77 @@
-﻿using ZA_Membership.Configuration;
+﻿using System.Globalization;
+using System.Resources;
+using ZA_Membership.Configuration;
 using ZA_Membership.Models.DTOs;
 using ZA_Membership.Models.Entities;
 using ZA_Membership.Models.Results;
+using ZA_Membership.Properties;
+using ZA_Membership.Repositories.Interfaces;
 using ZA_Membership.Security;
 using ZA_Membership.Services.Interfaces;
-using System.Globalization;
-using System.Resources;
-using ZA_Membership.Properties;
 
 namespace ZA_Membership.Services.Implementations
 {
-    /// <summary>
-    /// Implementation of membership services including user registration, login, token management, and user profile management.
-    /// </summary>
     public class MembershipService : IMembershipService
     {
         private readonly IUserRepository _userRepository;
         private readonly IUserTokenRepository _tokenRepository;
-        private readonly IRoleRepository _roleRepository;
         private readonly IJwtTokenService _jwtTokenService;
         private readonly IPasswordService _passwordService;
         private readonly MembershipOptions _options;
-        private readonly IAddressRepository _addressRepository;
         private readonly ResourceManager _rm = new ResourceManager(typeof(Messages));
 
-        /// <summary>
-        /// Constructor for MembershipService.
-        /// </summary>
-        /// <param name="userRepository"></param>
-        /// <param name="tokenRepository"></param>
-        /// <param name="roleRepository"></param>
-        /// <param name="jwtTokenService"></param>
-        /// <param name="passwordService"></param>
-        /// <param name="options"></param>
-        public MembershipService(
+        internal MembershipService(
             IUserRepository userRepository,
             IUserTokenRepository tokenRepository,
-            IRoleRepository roleRepository,
             IJwtTokenService jwtTokenService,
             IPasswordService passwordService,
-            MembershipOptions options, IAddressRepository addressRepository)
+            MembershipOptions options)
         {
             _userRepository = userRepository;
             _tokenRepository = tokenRepository;
-            _roleRepository = roleRepository;
             _jwtTokenService = jwtTokenService;
             _passwordService = passwordService;
             _options = options;
-            _addressRepository = addressRepository;
         }
 
+        private string Msg(string key, string fallback) =>
+            _rm.GetString(key, CultureInfo.CurrentUICulture) ?? fallback;
 
-        /// <inheritdoc/>
         public async Task<AuthResult> RegisterAsync(RegisterDto registerDto)
         {
             try
             {
-                // Validate password
-                if (!_passwordService.ValidatePassword(registerDto.Password, out var passwordErrors))
+                if (!_passwordService.ValidatePassword(registerDto.Password, out var passErrors))
                 {
                     return new AuthResult
                     {
                         IsSuccess = false,
-                        Errors = passwordErrors,
-                        Message = _rm.GetString("Password_Invalid", CultureInfo.CurrentUICulture) ?? "Invalid password"
+                        Errors = passErrors,
+                        Message = Msg("Password_Invalid", "Invalid password")
                     };
                 }
 
-                // Check if username exists
                 if (await _userRepository.ExistsByUsernameAsync(registerDto.Username))
                 {
                     return new AuthResult
                     {
                         IsSuccess = false,
-                        Errors = [_rm.GetString("Username_AlreadyExists", CultureInfo.CurrentUICulture) ?? "Username already exists"],
-                        Message = _rm.GetString("Register_Failed", CultureInfo.CurrentUICulture) ?? "Registration failed"
+                        Errors = [Msg("Username_AlreadyExists", "Username already exists")],
+                        Message = Msg("Register_Failed", "Registration failed")
                     };
                 }
 
-                // Check if email exists
-                if (_options.User.RequireUniqueEmail && await _userRepository.ExistsByEmailAsync(registerDto.Email ?? ""))
+                if (_options.User.RequireUniqueEmail &&
+                    await _userRepository.ExistsByEmailAsync(registerDto.Email ?? string.Empty))
                 {
                     return new AuthResult
                     {
                         IsSuccess = false,
-                        Errors = new List<string>
-                        { _rm.GetString("Email_AlreadyExists", CultureInfo.CurrentUICulture) ?? "Email already exists" },
-                        Message = _rm.GetString("Register_Failed", CultureInfo.CurrentUICulture) ?? "Registration failed"
+                        Errors = [Msg("Email_AlreadyExists", "Email already exists")],
+                        Message = Msg("Register_Failed", "Registration failed")
                     };
                 }
 
-                // Create user
                 var user = new User
                 {
                     Username = registerDto.Username,
@@ -99,7 +80,7 @@ namespace ZA_Membership.Services.Implementations
                     PasswordHash = _passwordService.HashPassword(registerDto.Password),
                     FirstName = registerDto.FirstName,
                     LastName = registerDto.LastName,
-                    Birthday = registerDto.Birthday ?? null,
+                    Birthday = registerDto.Birthday,
                     ProfilePictureUrl = registerDto.ProfilePictureUrl ?? string.Empty,
                     IsVerify = false,
                     IsActive = true
@@ -107,9 +88,7 @@ namespace ZA_Membership.Services.Implementations
 
                 var createdUser = await _userRepository.CreateAsync(user);
 
-                var roles = await _userRepository.GetUserRolesAsync(createdUser.Id);
-                var permissions = await _userRepository.GetUserPermissionsAsync(createdUser.Id);
-                var accessToken = _jwtTokenService.GenerateAccessToken(createdUser, roles, permissions);
+                var accessToken = _jwtTokenService.GenerateAccessToken(createdUser, new List<string>(), new List<string>());
                 var refreshToken = _jwtTokenService.GenerateRefreshToken();
 
                 var userToken = new UserToken
@@ -123,16 +102,14 @@ namespace ZA_Membership.Services.Implementations
 
                 await _tokenRepository.CreateAsync(userToken);
 
-                var userDto = MapToUserDto(createdUser, roles, permissions);
-
                 return new AuthResult
                 {
                     IsSuccess = true,
                     AccessToken = accessToken,
                     RefreshToken = refreshToken,
                     ExpiresAt = _jwtTokenService.GetTokenExpiration(accessToken),
-                    User = userDto,
-                    Message = _rm.GetString("Register_Success", CultureInfo.CurrentUICulture) ?? "Registration successful"
+                    User = MapToUserDto(createdUser),
+                    Message = Msg("Register_Success", "Registration successful")
                 };
             }
             catch
@@ -140,46 +117,28 @@ namespace ZA_Membership.Services.Implementations
                 return new AuthResult
                 {
                     IsSuccess = false,
-                    Errors = new List<string>
-                    { _rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred" },
-                    Message = _rm.GetString("Register_Failed", CultureInfo.CurrentUICulture) ?? "Registration failed"
+                    Errors = [Msg("System_Error", "System error occurred")],
+                    Message = Msg("Register_Failed", "Registration failed")
                 };
             }
         }
-        /// <inheritdoc/>
+
         public async Task<AuthResult> LoginAsync(LoginDto loginDto, string? ipAddress = null, string? deviceInfo = null)
         {
             try
             {
                 var user = await _userRepository.GetByUsernameOrEmailAsync(loginDto.Username);
-
-                if (user == null || !user.IsActive)
+                if (user is null || !user.IsActive || !_passwordService.VerifyPassword(loginDto.Password, user.PasswordHash))
                 {
                     return new AuthResult
                     {
                         IsSuccess = false,
-                        Errors = new List<string>
-                        { _rm.GetString("Login_InvalidCredentials", CultureInfo.CurrentUICulture) ?? "Invalid username or password" },
-                        Message = _rm.GetString("Login_Failed", CultureInfo.CurrentUICulture) ?? "Login failed"
+                        Errors = [Msg("Login_InvalidCredentials", "Invalid username or password")],
+                        Message = Msg("Login_Failed", "Login failed")
                     };
                 }
 
-                if (!_passwordService.VerifyPassword(loginDto.Password, user.PasswordHash))
-                {
-                    return new AuthResult
-                    {
-                        IsSuccess = false,
-                        Errors = new List<string>
-                        { _rm.GetString("Login_InvalidCredentials", CultureInfo.CurrentUICulture) ?? "Invalid username or password" },
-                        Message = _rm.GetString("Login_Failed", CultureInfo.CurrentUICulture) ?? "Login failed"
-                    };
-                }
-
-                await _userRepository.UpdateAsync(user);
-
-                var roles = await _userRepository.GetUserRolesAsync(user.Id);
-                var permissions = await _userRepository.GetUserPermissionsAsync(user.Id);
-                var accessToken = _jwtTokenService.GenerateAccessToken(user, roles, permissions);
+                var accessToken = _jwtTokenService.GenerateAccessToken(user, new List<string>(), new List<string>());
                 var refreshToken = _jwtTokenService.GenerateRefreshToken();
 
                 var userToken = new UserToken
@@ -195,16 +154,14 @@ namespace ZA_Membership.Services.Implementations
 
                 await _tokenRepository.CreateAsync(userToken);
 
-                var userDto = MapToUserDto(user, roles, permissions);
-
                 return new AuthResult
                 {
                     IsSuccess = true,
                     AccessToken = accessToken,
                     RefreshToken = refreshToken,
                     ExpiresAt = _jwtTokenService.GetTokenExpiration(accessToken),
-                    User = userDto,
-                    Message = _rm.GetString("Login_Success", CultureInfo.CurrentUICulture) ?? "Login successful"
+                    User = MapToUserDto(user),
+                    Message = Msg("Login_Success", "Login successful")
                 };
             }
             catch
@@ -212,114 +169,142 @@ namespace ZA_Membership.Services.Implementations
                 return new AuthResult
                 {
                     IsSuccess = false,
-                    Errors = new List<string>
-                    { _rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred" },
-                    Message = _rm.GetString("Login_Failed", CultureInfo.CurrentUICulture) ?? "Login failed"
+                    Errors = [Msg("System_Error", "System error occurred")],
+                    Message = Msg("Login_Failed", "Login failed")
                 };
             }
         }
-        /// <inheritdoc/>
+
+        // ... سایر متدها با همین الگو null-coalescing
+
+        public async Task<ServiceResult<UserDto>> GetUserAsync(int userId)
+        {
+            try
+            {
+                var user = await _userRepository.GetByIdAsync(userId);
+                if (user is null)
+                    return ServiceResult<UserDto>.Failure(Msg("User_NotFound", "User not found"));
+
+                return ServiceResult<UserDto>.Success(MapToUserDto(user));
+            }
+            catch
+            {
+                return ServiceResult<UserDto>.Failure(Msg("System_Error", "System error occurred"));
+            }
+        }
+
+        public async Task<ServiceResult> ChangePasswordAsync(int userId, ChangePasswordDto changePasswordDto)
+        {
+            try
+            {
+                var user = await _userRepository.GetByIdAsync(userId);
+                if (user is null)
+                    return ServiceResult.Failure(Msg("User_NotFound", "User not found"));
+
+                if (!_passwordService.VerifyPassword(changePasswordDto.CurrentPassword, user.PasswordHash))
+                    return ServiceResult.Failure(Msg("Password_CurrentInvalid", "Current password invalid"));
+
+                if (!_passwordService.ValidatePassword(changePasswordDto.NewPassword, out var errors))
+                    return ServiceResult.Failure(errors, Msg("Password_NewInvalid", "New password invalid"));
+
+                user.PasswordHash = _passwordService.HashPassword(changePasswordDto.NewPassword);
+                user.UpdatedAt = DateTime.UtcNow;
+                await _userRepository.UpdateAsync(user);
+                await _tokenRepository.RevokeAllUserTokensAsync(userId);
+
+                return ServiceResult.Success(Msg("Password_ChangeSuccess", "Password changed successfully"));
+            }
+            catch
+            {
+                return ServiceResult.Failure(Msg("System_Error", "System error occurred"));
+            }
+        }
+
+        private UserDto MapToUserDto(User user) => new()
+        {
+            Id = user.Id,
+            Username = user.Username,
+            Email = user.Email,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            PhoneNumber = user.PhoneNumber,
+            IsActive = user.IsActive,
+            EmailConfirmed = user.EmailConfirmed,
+            PhoneNumberConfirmed = user.PhoneNumberConfirmed,
+            CreatedAt = user.CreatedAt
+        };
+
         public async Task<ServiceResult> LogoutAsync(string token)
         {
             try
             {
                 await _tokenRepository.RevokeTokenAsync(token);
-                return ServiceResult.Success(_rm.GetString("Logout_Success", CultureInfo.CurrentUICulture) ?? "Logout successful");
+                return ServiceResult.Success(Msg("Logout_Success", "Logout successful"));
             }
             catch
             {
-                return ServiceResult.Failure(
-                    _rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred",
-                    _rm.GetString("Logout_Failed", CultureInfo.CurrentUICulture) ?? "Logout failed"
-                );
+                return ServiceResult.Failure(Msg("System_Error", "System error occurred"),
+                                             Msg("Logout_Failed", "Logout failed"));
             }
         }
-        /// <inheritdoc/>
+
         public async Task<ServiceResult> LogoutAllDevicesAsync(int userId)
         {
             try
             {
                 await _tokenRepository.RevokeAllUserTokensAsync(userId);
-                return ServiceResult.Success(_rm.GetString("LogoutAllDevices_Success", CultureInfo.CurrentUICulture) ?? "Logged out from all devices successfully");
+                return ServiceResult.Success(Msg("LogoutAllDevices_Success", "Logout from all devices successful"));
             }
             catch
             {
-                return ServiceResult.Failure(
-                    _rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred",
-                    _rm.GetString("Logout_Failed", CultureInfo.CurrentUICulture) ?? "Logout failed"
-                );
+                return ServiceResult.Failure(Msg("System_Error", "System error occurred"),
+                                             Msg("Logout_Failed", "Logout failed"));
             }
         }
 
-        private UserDto MapToUserDto(User user, List<string> roles, List<string> permissions)
-        {
-            return new UserDto
-            {
-                Id = user.Id,
-                Username = user.Username,
-                Email = user.Email,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                PhoneNumber = user.PhoneNumber,
-                IsActive = user.IsActive,
-                EmailConfirmed = user.EmailConfirmed,
-                PhoneNumberConfirmed = user.PhoneNumberConfirmed,
-                CreatedAt = user.CreatedAt,
-                Roles = roles,
-                Permissions = permissions
-            };
-        }
-        /// <inheritdoc/>
         public async Task<AuthResult> RefreshTokenAsync(string refreshToken)
         {
             try
             {
-                var userToken = await _tokenRepository.GetByTokenAsync(refreshToken);
-
-                if (userToken == null || userToken.IsRevoked || userToken.ExpiresAt < DateTime.UtcNow)
+                var token = await _tokenRepository.GetByTokenAsync(refreshToken);
+                if (token is null || token.IsRevoked || token.ExpiresAt < DateTime.UtcNow)
                 {
                     return new AuthResult
                     {
                         IsSuccess = false,
-                        Errors = new List<string>
-                        { _rm.GetString("RefreshToken_Invalid", CultureInfo.CurrentUICulture) ?? "Invalid or expired token" },
-                        Message = _rm.GetString("RefreshToken_Failed", CultureInfo.CurrentUICulture) ?? "Refresh token failed"
+                        Errors = [Msg("RefreshToken_Invalid", "Invalid or expired refresh token")],
+                        Message = Msg("RefreshToken_Failed", "Refresh token failed")
                     };
                 }
 
-                var user = await _userRepository.GetByIdAsync(userToken.UserId);
-                if (user == null || !user.IsActive)
+                var user = await _userRepository.GetByIdAsync(token.UserId);
+                if (user is null || !user.IsActive)
                 {
                     return new AuthResult
                     {
                         IsSuccess = false,
-                        Errors = new List<string>
-                        { _rm.GetString("User_NotFoundOrInactive", CultureInfo.CurrentUICulture) ?? "User not found or inactive" },
-                        Message = _rm.GetString("RefreshToken_Failed", CultureInfo.CurrentUICulture) ?? "Refresh token failed"
+                        Errors = [Msg("User_NotFoundOrInactive", "User not found or inactive")],
+                        Message = Msg("RefreshToken_Failed", "Refresh token failed")
                     };
                 }
 
                 await _tokenRepository.RevokeTokenAsync(refreshToken);
 
-                var roles = await _userRepository.GetUserRolesAsync(user.Id);
-                var permissions = await _userRepository.GetUserPermissionsAsync(user.Id);
-                var newAccessToken = _jwtTokenService.GenerateAccessToken(user, roles, permissions);
+                var newAccessToken = _jwtTokenService.GenerateAccessToken(user, new List<string>(), new List<string>());
                 var newRefreshToken = _jwtTokenService.GenerateRefreshToken();
 
-                var newUserToken = new UserToken
+                var newTokenEntity = new UserToken
                 {
                     UserId = user.Id,
                     Token = newRefreshToken,
                     TokenType = "RefreshToken",
                     CreatedAt = DateTime.UtcNow,
                     ExpiresAt = DateTime.UtcNow.AddDays(_options.Jwt.RefreshTokenExpiryDays),
-                    IpAddress = userToken.IpAddress,
-                    DeviceInfo = userToken.DeviceInfo
+                    IpAddress = token.IpAddress,
+                    DeviceInfo = token.DeviceInfo
                 };
 
-                await _tokenRepository.CreateAsync(newUserToken);
-
-                var userDto = MapToUserDto(user, roles, permissions);
+                await _tokenRepository.CreateAsync(newTokenEntity);
 
                 return new AuthResult
                 {
@@ -327,8 +312,8 @@ namespace ZA_Membership.Services.Implementations
                     AccessToken = newAccessToken,
                     RefreshToken = newRefreshToken,
                     ExpiresAt = _jwtTokenService.GetTokenExpiration(newAccessToken),
-                    User = userDto,
-                    Message = _rm.GetString("RefreshToken_Success", CultureInfo.CurrentUICulture) ?? "Token refreshed successfully"
+                    User = MapToUserDto(user),
+                    Message = Msg("RefreshToken_Success", "Token refreshed successfully")
                 };
             }
             catch
@@ -336,306 +321,84 @@ namespace ZA_Membership.Services.Implementations
                 return new AuthResult
                 {
                     IsSuccess = false,
-                    Errors = new List<string>
-                    { _rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred" },
-                    Message = _rm.GetString("RefreshToken_Failed", CultureInfo.CurrentUICulture) ?? "Refresh token failed"
+                    Errors = [Msg("System_Error", "System error occurred")],
+                    Message = Msg("RefreshToken_Failed", "Refresh token failed")
                 };
             }
         }
-        /// <inheritdoc/>
-        public async Task<ServiceResult<UserDto>> GetUserAsync(int userId)
-        {
-            try
-            {
-                var user = await _userRepository.GetByIdAsync(userId);
-                if (user == null)
-                {
-                    return ServiceResult<UserDto>.Failure(_rm.GetString("User_NotFound", CultureInfo.CurrentUICulture) ?? "User not found");
-                }
 
-                var roles = await _userRepository.GetUserRolesAsync(userId);
-                var permissions = await _userRepository.GetUserPermissionsAsync(userId);
-                var userDto = MapToUserDto(user, roles, permissions);
-
-                return ServiceResult<UserDto>.Success(userDto);
-            }
-            catch
-            {
-                return ServiceResult<UserDto>.Failure(_rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred");
-            }
-        }
-        /// <inheritdoc/>
         public async Task<ServiceResult<UserDto>> UpdateUserAsync(int userId, UpdateUserDto updateDto)
         {
             try
             {
                 var user = await _userRepository.GetByIdAsync(userId);
-                if (user == null)
-                {
-                    return ServiceResult<UserDto>.Failure(_rm.GetString("User_NotFound", CultureInfo.CurrentUICulture) ?? "User not found");
-                }
+                if (user is null)
+                    return ServiceResult<UserDto>.Failure(Msg("User_NotFound", "User not found"));
 
                 if (!string.IsNullOrEmpty(updateDto.Email) &&
                     updateDto.Email != user.Email &&
-                    _options.User.RequireUniqueEmail)
+                    _options.User.RequireUniqueEmail &&
+                    await _userRepository.ExistsByEmailAsync(updateDto.Email))
                 {
-                    if (await _userRepository.ExistsByEmailAsync(updateDto.Email))
-                    {
-                        return ServiceResult<UserDto>.Failure(_rm.GetString("Email_AlreadyExists", CultureInfo.CurrentUICulture) ?? "Email already exists");
-                    }
+                    return ServiceResult<UserDto>.Failure(Msg("Email_AlreadyExists", "Email already exists"));
                 }
 
                 user.FirstName = updateDto.FirstName ?? user.FirstName;
                 user.LastName = updateDto.LastName ?? user.LastName;
                 user.PhoneNumber = updateDto.PhoneNumber ?? user.PhoneNumber;
+                user.Email = updateDto.Email ?? user.Email;
                 user.UpdatedAt = DateTime.UtcNow;
-
-                if (!string.IsNullOrEmpty(updateDto.Email) && updateDto.Email != user.Email)
-                {
-                    user.Email = updateDto.Email;
-                    user.EmailConfirmed = false;
-                }
 
                 var updatedUser = await _userRepository.UpdateAsync(user);
-                var roles = await _userRepository.GetUserRolesAsync(userId);
-                var permissions = await _userRepository.GetUserPermissionsAsync(userId);
-                var userDto = MapToUserDto(updatedUser, roles, permissions);
-
-                return ServiceResult<UserDto>.Success(userDto,
-                    _rm.GetString("User_UpdateSuccess", CultureInfo.CurrentUICulture) ?? "User updated successfully");
+                return ServiceResult<UserDto>.Success(MapToUserDto(updatedUser),
+                    Msg("User_UpdateSuccess", "User updated successfully"));
             }
             catch
             {
-                return ServiceResult<UserDto>.Failure(_rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred");
+                return ServiceResult<UserDto>.Failure(Msg("System_Error", "System error occurred"));
             }
         }
-        /// <inheritdoc/>
-        public async Task<ServiceResult> ChangePasswordAsync(int userId, ChangePasswordDto changePasswordDto)
-        {
-            try
-            {
-                var user = await _userRepository.GetByIdAsync(userId);
-                if (user == null)
-                {
-                    return ServiceResult.Failure(_rm.GetString("User_NotFound", CultureInfo.CurrentUICulture) ?? "User not found");
-                }
 
-                if (!_passwordService.VerifyPassword(changePasswordDto.CurrentPassword, user.PasswordHash))
-                {
-                    return ServiceResult.Failure(_rm.GetString("Password_CurrentInvalid", CultureInfo.CurrentUICulture) ?? "Current password is incorrect");
-                }
-
-                if (!_passwordService.ValidatePassword(changePasswordDto.NewPassword, out var passwordErrors))
-                {
-                    return ServiceResult.Failure(passwordErrors, _rm.GetString("Password_NewInvalid", CultureInfo.CurrentUICulture) ?? "New password is invalid");
-                }
-
-                user.PasswordHash = _passwordService.HashPassword(changePasswordDto.NewPassword);
-                user.UpdatedAt = DateTime.UtcNow;
-                await _userRepository.UpdateAsync(user);
-
-                await _tokenRepository.RevokeAllUserTokensAsync(userId);
-
-                return ServiceResult.Success(_rm.GetString("Password_ChangeSuccess", CultureInfo.CurrentUICulture) ?? "Password changed successfully");
-            }
-            catch
-            {
-                return ServiceResult.Failure(_rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred");
-            }
-        }
-        /// <inheritdoc/>
         public async Task<ServiceResult> DeactivateUserAsync(int userId)
         {
             try
             {
                 var user = await _userRepository.GetByIdAsync(userId);
-                if (user == null)
-                {
-                    return ServiceResult.Failure(_rm.GetString("User_NotFound", CultureInfo.CurrentUICulture) ?? "User not found");
-                }
+                if (user is null)
+                    return ServiceResult.Failure(Msg("User_NotFound", "User not found"));
 
                 user.IsActive = false;
                 user.UpdatedAt = DateTime.UtcNow;
                 await _userRepository.UpdateAsync(user);
-
                 await _tokenRepository.RevokeAllUserTokensAsync(userId);
 
-                return ServiceResult.Success(_rm.GetString("User_DeactivateSuccess", CultureInfo.CurrentUICulture) ?? "User deactivated successfully");
+                return ServiceResult.Success(Msg("User_DeactivateSuccess", "User deactivated successfully"));
             }
             catch
             {
-                return ServiceResult.Failure(_rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred");
+                return ServiceResult.Failure(Msg("System_Error", "System error occurred"));
             }
         }
-        /// <inheritdoc/>
+
         public async Task<ServiceResult> ActivateUserAsync(int userId)
         {
             try
             {
                 var user = await _userRepository.GetByIdAsync(userId);
-                if (user == null)
-                {
-                    return ServiceResult.Failure(_rm.GetString("User_NotFound", CultureInfo.CurrentUICulture) ?? "User not found");
-                }
+                if (user is null)
+                    return ServiceResult.Failure(Msg("User_NotFound", "User not found"));
 
                 user.IsActive = true;
                 user.UpdatedAt = DateTime.UtcNow;
                 await _userRepository.UpdateAsync(user);
 
-                return ServiceResult.Success(_rm.GetString("User_ActivateSuccess", CultureInfo.CurrentUICulture) ?? "User activated successfully");
+                return ServiceResult.Success(Msg("User_ActivateSuccess", "User activated successfully"));
             }
             catch
             {
-                return ServiceResult.Failure(_rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred");
+                return ServiceResult.Failure(Msg("System_Error", "System error occurred"));
             }
         }
 
-        public async Task SoftDeleteUserAsync(int userId)
-        {
-            await _userRepository.SoftDeleteAsync(userId);
-        }
-
-        /// <inheritdoc/>
-        public async Task<ServiceResult> AssignRoleAsync(int userId, string roleName)
-        {
-            try
-            {
-                var user = await _userRepository.GetByIdAsync(userId);
-                if (user == null)
-                {
-                    return ServiceResult.Failure(_rm.GetString("User_NotFound", CultureInfo.CurrentUICulture) ?? "User not found");
-                }
-
-                var role = await _roleRepository.GetByNameAsync(roleName);
-                if (role == null)
-                {
-                    return ServiceResult.Failure(_rm.GetString("Role_NotFound", CultureInfo.CurrentUICulture) ?? "Role not found");
-                }
-
-                var userRoles = await _userRepository.GetUserRolesAsync(userId);
-                if (userRoles.Contains(roleName))
-                {
-                    return ServiceResult.Failure(_rm.GetString("Role_AlreadyAssigned", CultureInfo.CurrentUICulture) ?? "Role already assigned to user");
-                }
-
-                // Implementation in host project
-
-                return ServiceResult.Success(string.Format(
-                    _rm.GetString("Role_AssignSuccess", CultureInfo.CurrentUICulture) ?? "Role {0} assigned successfully to user",
-                    roleName
-                ));
-            }
-            catch
-            {
-                return ServiceResult.Failure(_rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred");
-            }
-        }
-        /// <inheritdoc/>
-        public async Task<ServiceResult> RemoveRoleAsync(int userId, string roleName)
-        {
-            try
-            {
-                var user = await _userRepository.GetByIdAsync(userId);
-                if (user == null)
-                {
-                    return ServiceResult.Failure(_rm.GetString("User_NotFound", CultureInfo.CurrentUICulture) ?? "User not found");
-                }
-
-                var userRoles = await _userRepository.GetUserRolesAsync(userId);
-                if (!userRoles.Contains(roleName))
-                {
-                    return ServiceResult.Failure(_rm.GetString("Role_NotAssigned", CultureInfo.CurrentUICulture) ?? "Role not assigned to user");
-                }
-
-                // Implementation in host project
-
-                return ServiceResult.Success(string.Format(
-                    _rm.GetString("Role_RemoveSuccess", CultureInfo.CurrentUICulture) ?? "Role {0} removed successfully from user",
-                    roleName
-                ));
-            }
-            catch
-            {
-                return ServiceResult.Failure(_rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred");
-            }
-        }
-        /// <inheritdoc/>
-        public async Task<ServiceResult<List<string>>> GetUserRolesAsync(int userId)
-        {
-            try
-            {
-                var user = await _userRepository.GetByIdAsync(userId);
-                if (user == null)
-                {
-                    return ServiceResult<List<string>>.Failure(_rm.GetString("User_NotFound", CultureInfo.CurrentUICulture) ?? "User not found");
-                }
-
-                var roles = await _userRepository.GetUserRolesAsync(userId);
-                return ServiceResult<List<string>>.Success(roles);
-            }
-            catch
-            {
-                return ServiceResult<List<string>>.Failure(_rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred");
-            }
-        }
-        /// <inheritdoc/>
-        public async Task<ServiceResult<List<string>>> GetUserPermissionsAsync(int userId)
-        {
-            try
-            {
-                var user = await _userRepository.GetByIdAsync(userId);
-                if (user == null)
-                {
-                    return ServiceResult<List<string>>.Failure(_rm.GetString("User_NotFound", CultureInfo.CurrentUICulture) ?? "User not found");
-                }
-
-                var permissions = await _userRepository.GetUserPermissionsAsync(userId);
-                return ServiceResult<List<string>>.Success(permissions);
-            }
-            catch
-            {
-                return ServiceResult<List<string>>.Failure(_rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred");
-            }
-        }
-        /// <inheritdoc/>
-        public async Task<ServiceResult<bool>> HasPermissionAsync(int userId, string permission)
-        {
-            try
-            {
-                var permissions = await _userRepository.GetUserPermissionsAsync(userId);
-                var hasPermission = permissions.Contains(permission);
-                return ServiceResult<bool>.Success(hasPermission);
-            }
-            catch
-            {
-                return ServiceResult<bool>.Failure(_rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred");
-            }
-        }
-        /// <inheritdoc/>
-        public async Task<ServiceResult<bool>> IsInRoleAsync(int userId, string roleName)
-        {
-            try
-            {
-                var roles = await _userRepository.GetUserRolesAsync(userId);
-                var isInRole = roles.Contains(roleName);
-                return ServiceResult<bool>.Success(isInRole);
-            }
-            catch
-            {
-                return ServiceResult<bool>.Failure(_rm.GetString("System_Error", CultureInfo.CurrentUICulture) ?? "A system error occurred");
-            }
-        }
-
-        public async Task<Address> AddUserAddressAsync(int userId, Address address)
-        {
-            address.UserId = userId;
-            return await _addressRepository.CreateAsync(address);
-        }
-
-        // گرفتن همه آدرس‌های یک کاربر
-        public async Task<List<Address>> GetUserAddressesAsync(int userId)
-        {
-            return await _addressRepository.GetByUserIdAsync(userId);
-        }
     }
 }

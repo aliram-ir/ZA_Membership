@@ -1,11 +1,11 @@
 using ZA_Membership.Models.Entities;
 
-namespace ZA_Membership.Services.Interfaces
+namespace ZA_Membership.Repositories.Interfaces
 {
     /// <summary>
     /// Repository interface for managing User entities.
     /// </summary>
-    public interface IUserRepository
+    internal interface IUserRepository
     {
         /// <summary>
         /// دریافت کاربر بر اساس شناسه
