@@ -1,0 +1,8 @@
+﻿"ZAMembership": {
+  "ConnectionString": "Server=localhost;Database=ZAMembershipDb;User Id=sa;Password=YourPassword;",
+  "Jwt": {
+    "SecretKey": "your_secret",
+    "Issuer": "your_issuer",
+    "Audience": "your_audience"
+  }
+}

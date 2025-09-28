@@ -27,5 +27,11 @@ namespace ZA_Membership.Configuration
         /// Configuration options for security-related settings.
         /// </summary>
         public SecurityOptions Security { get; set; } = new();
+
+        /// <summary>
+        /// گرفتن رشته اتصال از پروژه میزبان
+        /// </summary>
+        public string ConnectionString { get; set; } = string.Empty;
+
     }
 }

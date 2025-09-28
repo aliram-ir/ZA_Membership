@@ -1,5 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ZA_Membership.Data.Configurations;
+﻿/* Developer: Ali Ramezani 
+ * Corporation: Zarinafzar ™
+ * Contact: ☎ 03191098575 
+ * Github: © github.com/aliram-ir/ZA_Membership
+ * WebSite: ☛ aliram.ir - zarinafzar.com
+ * Produced with ❤️
+ */
+using Microsoft.EntityFrameworkCore;
 using ZA_Membership.Models.Entities;
 
 namespace ZA_Membership.Data
@@ -24,6 +30,9 @@ namespace ZA_Membership.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.ApplyConfigurationsFromAssembly(typeof(MembershipDbContext).Assembly);
+
+            SeedData.Seed(builder);
+
             #region Manual Configs
             //builder.ApplyConfiguration(new UserConfiguration());
             //builder.ApplyConfiguration(new RoleConfiguration());

@@ -31,10 +31,15 @@ namespace ZA_Membership.Extensions
 
             // Register DbContext for ZA_Membership
             services.AddDbContext<MembershipDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
-                    sqlOptions => sqlOptions.MigrationsAssembly(typeof(MembershipDbContext).Assembly.FullName)
-                )
-            );
+            options.UseSqlServer(membershipOptions.ConnectionString,
+            sqlOptions => sqlOptions.MigrationsAssembly
+            (typeof(MembershipDbContext).Assembly.FullName)));
+
+            //services.AddDbContext<MembershipDbContext>(options =>
+            //    options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
+            //        sqlOptions => sqlOptions.MigrationsAssembly(typeof(MembershipDbContext).Assembly.FullName)
+            //    )
+            //);
 
             // Register repositories
             services.AddScoped<IUserRepository, UserRepository>();
